@@ -70,7 +70,7 @@
     // 🛡️ Verificar sesión
     const userSession = JSON.parse(localStorage.getItem('usuarioCaminataSana'));
     if (!userSession || userSession.rol_id !== 1) {
-        window.location.href = "../../auth/INDEX.HTML";
+        window.location.href = "../../auth/inicio_Sesion.HTML";
     } else {
         // Asegúrate de que este ID coincida con tu HTML (admin-sidebar-name o admin-name)
         const nameElement = document.getElementById('admin-sidebar-name') || document.getElementById('admin-name');

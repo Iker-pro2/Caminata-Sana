@@ -73,7 +73,7 @@
 <script>
     const session = JSON.parse(localStorage.getItem('usuarioCaminataSana'));
     if (!session || session.rol_id !== 1) {
-        window.location.href = "../../auth/INDEX.HTML";
+        window.location.href = "../../auth/inicio_Sesion.HTML";
     } else {
         document.getElementById('admin-name').innerText = session.nombre;
     }
