@@ -24,7 +24,7 @@ app.use(express.json());
 
 // CORS (PRODUCCIÓN)
 app.use(cors({
-    origin: '*', // luego puedes restringirlo a tu dominio
+    origin: 'https://caminata-sana-1.onrender.com/', // luego puedes restringirlo a tu dominio
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
