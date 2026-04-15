@@ -9,7 +9,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
-
+const path = require('path');
 dotenv.config();
 
 const app = express();
@@ -18,16 +18,35 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ==============================
-// MIDDLEWARES
+// IMPORTACIÓN DE MÓDULOS (Asegúrate de tener esto al inicio)
 // ==============================
-app.use(express.json());
+const path = require('path');
 
-// CORS (PRODUCCIÓN)
+// ... (tus otros requires)
+
+// ==============================
+// MIDDLEWARES Y RUTAS ESTÁTICAS
+// ==============================
+
+// 1. Habilitar CORS (Configuración corregida para Render)
 app.use(cors({
-    origin: 'https://caminata-sana-1.onrender.com/', // luego puedes restringirlo a tu dominio
+    origin: 'https://caminata-sana-1.onrender.com', // Sin la barra "/" al final
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// 2. Lectura de JSON
+app.use(express.json());
+
+// 3. Servir archivos estáticos (Imágenes, CSS, JS)
+// Esto permite que el navegador acceda a las carpetas dentro de CONTENEDOR
+app.use(express.static(path.join(__dirname, '../CONTENEDOR')));
+
+// 4. Ruta raíz para cargar tu aplicación
+// Esto resuelve el error "Cannot GET /" enviando tu archivo index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../CONTENEDOR', 'pagina web', 'index.html'));
+});
 
 // ==============================
 // TOKENS DE RECUPERACIÓN
