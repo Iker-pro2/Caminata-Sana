@@ -213,7 +213,7 @@ if (updateBtn) {
 
     let valor = "";
     // IMPORTANTE: Cambia esta URL por la de tu ngrok para que conecte con el servidor (puerto 3000)
-    const API_URL = "https://mercilessly-micellar-annika.ngrok-free.dev";
+    const API_URL = "https://caminata-sana.onrender.com/";
     let endpoint = `${API_URL}/api/usuarios/update-${tipo}`;
     
     let payload = { usuarioId: usuarioId };

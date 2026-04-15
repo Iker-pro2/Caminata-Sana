@@ -87,7 +87,7 @@
     </div>
 
 <script>
-const API_URL = "https://mercilessly-micellar-annika.ngrok-free.dev";
+const API_URL = "https://caminata-sana.onrender.com";
 const STORAGE_KEY = "usuarioCaminataSana";
 
 const loginForm = document.getElementById("loginForm");
@@ -122,9 +122,10 @@ function verificarSesion() {
 
         const user = JSON.parse(usuario);
 
-        window.location.href = user.rol_id === 1
-            ? "../CONTENIDO/admin/dashboard.html"
-            : "../CONTENIDO/index.html";
+/* REDIRECCIÓN CORRECTA */
+window.location.href = data.usuario.rol_id === 1
+    ? "/CONTENIDO/admin/dashboard.html" // Quita los puntos ".."
+    : "/CONTENIDO/index.html";          // Quita los puntos ".."
 
     } catch (e) {
         localStorage.clear();

@@ -6,7 +6,7 @@
     <title>Registro de Locales | Caminata Sana</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../style/Registro_locales.css">
+    <link rel="stylesheet" href="../CONTENIDO/style/Registro_locales.css">
 </head>
 <body>
 
@@ -160,7 +160,7 @@ form.addEventListener('submit', async (e) => {
     };
 
     try {
-        const resp = await fetch('http://192.168.0.17:3000/api/solicitar-afiliacion', {
+        const resp = await fetch('https://caminata-sana.onrender.com/api/solicitar-afiliacion', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)

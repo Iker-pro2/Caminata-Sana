@@ -70,7 +70,7 @@
             const correo = document.getElementById("correo").value.trim();
 
             try {
-                const response = await fetch("http://192.168.0.21:3000/api/olvide-password", {
+                const response = await fetch("https://caminata-sana.onrender.com/api/olvide-password", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ correo })

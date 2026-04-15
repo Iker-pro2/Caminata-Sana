@@ -1,3 +1,6 @@
+// ==============================
+// CONFIGURACIÓN INICIAL
+// ==============================
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
@@ -8,63 +11,54 @@ const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 
 dotenv.config();
+
 const app = express();
 
-// 1. DEFINIR EL PUERTO
-const PORT = process.env.PORT || 3000; 
+// PUERTO (IMPORTANTE PARA RENDER)
+const PORT = process.env.PORT || 3000;
 
-// Objeto para almacenar tokens de recuperación (CORRECCIÓN: Se debe definir para evitar ReferenceError)
-const tokensRecuperacion = {};
-
-/* ============================================================================== 
-    1. CONFIGURACIÓN INICIAL (CORS Y MIDDLEWARES)
-============================================================================== */
-const allowedOrigins = [
-    'http://localhost:5500',
-    'http://10.10.198.161:5500',
-    'http://192.168.0.14:5500'
-];
-
-const corsOptions = {
-    origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
-        if (origin && origin.endsWith('.ngrok-free.dev')) {
-            return callback(null, true);
-        }
-        return callback(new Error('No permitido por CORS'));
-    },
-    methods: ['GET', 'POST','PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
-    credentials: true
-};
-
-app.use(cors(corsOptions));
+// ==============================
+// MIDDLEWARES
+// ==============================
 app.use(express.json());
 
-/* ============================================================================== 
-    2. CONEXIÓN A BASE DE DATOS
-============================================================================== */
+// CORS (PRODUCCIÓN)
+app.use(cors({
+    origin: '*', // luego puedes restringirlo a tu dominio
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// ==============================
+// TOKENS DE RECUPERACIÓN
+// ==============================
+const tokensRecuperacion = {};
+
+// ==============================
+// CONEXIÓN A BASE DE DATOS
+// ==============================
 const pool = mysql.createPool({
-    host: process.env.MYSQLHOST || 'localhost',
-    user: process.env.MYSQLUSER || 'root',
-    password: process.env.MYSQLPASSWORD || '',
-    database: process.env.MYSQLDATABASE || 'CaminataSana',
+    host: process.env.MYSQLHOST,
+    user: process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE,
     port: process.env.MYSQLPORT || 3306,
+
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
 
+// ==============================
+// TEST DE CONEXIÓN
+// ==============================
 pool.getConnection()
-    .then(connection => {
+    .then(conn => {
         console.log('✅ Conexión a MySQL exitosa');
-        connection.release();
+        conn.release();
     })
     .catch(err => {
-        console.error('❌ Error conectando a la base de datos:', err);
+        console.error('❌ Error conectando a MySQL:', err.message);
     });
 
 /* ==============================================================================
