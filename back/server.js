@@ -14,15 +14,6 @@ dotenv.config();
 
 const app = express();
 
-// PUERTO (IMPORTANTE PARA RENDER)
-const PORT = process.env.PORT || 3000;
-
-// ==============================
-// IMPORTACIÓN DE MÓDULOS (Asegúrate de tener esto al inicio)
-// ==============================
-const path = require('path');
-
-// ... (tus otros requires)
 
 // ==============================
 // MIDDLEWARES Y RUTAS ESTÁTICAS
