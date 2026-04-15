@@ -30,12 +30,13 @@ app.use(cors({
 app.use(express.json());
 // 3. Servir archivos estáticos (Imágenes, CSS, JS) desde CONTENEDOR
 // Eliminamos el '../' porque la carpeta está en la misma raíz que server.js
-app.use(express.static(path.join(__dirname, 'CONTENEDOR')));
+// 1. Para los archivos estáticos (subir un nivel con '..')
+app.use(express.static(path.join(__dirname, '..', 'CONTENEDOR')));
 
-// 4. Ruta raíz para cargar tu aplicación
+// 2. Para el archivo INDEX.HTML
 app.get('/', (req, res) => {
-    // Ajustamos la ruta para que coincida exactamente con tu carpeta 'pagina web'
-    res.sendFile(path.join(__dirname, 'CONTENEDOR', 'pagina web', 'INDEX.HTML'));
+    // Asegúrate de que los nombres coincidan exactamente con tu carpeta (Minúsculas/Mayúsculas)
+    res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'pagina web', 'INDEX.HTML'));
 });
 
 // ==============================
