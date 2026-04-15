@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Caminata Sana - Locales</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="../style/style_locales.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        const usuario = JSON.parse(localStorage.getItem('usuarioCaminataSana'));
+        if (!usuario) {
+            window.location.replace('../auth/INDEX.HTML');
+        }
+    </script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+        <link rel="stylesheet" href="../CONTENIDO/style.css">
+        <link rel="stylesheet" href="../style/navbar.css">
+    <script src="navbar.js"></script>
+    <section class="hero-section">
+        <h1 id="welcome-message"></h1>
+        <p id="total-locales">Buscando locales cercanos...</p>
+
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="local-search" placeholder="Buscar por nombre o dirección..." onkeyup="filtrarLocales()">
+        </div>
+    </section>
+
+    <div class="map-container" style="padding: 20px 8%;">
+        <div id="map" style="height: 350px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);"></div>
+    </div>
+
+    <main id="locales-container" class="locales-grid">
+        <div class="loading">Cargando locales...</div>
+    </main>
+
+    <script>
+    // 🌐 CONFIGURACIÓN: URL de ngrok
+    const API = "https://mercilessly-micellar-annika.ngrok-free.dev/api";
+    const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioCaminataSana"));
+
+    // Mensaje de bienvenida personalizado
+    if (usuarioLogueado) {
+        const welcomeElem = document.getElementById("welcome-message");
+        if (welcomeElem) welcomeElem.innerText = "Locales cerca de ti, " + usuarioLogueado.nombre;
+    }
+
+    let map, markers = [];
+
+    // 🗺️ INICIALIZAR MAPA (Leaflet)
+    function iniciarMapa(lat, lng) {
+        if (map) return; // Evitar reinicializar si ya existe
+        
+        map = L.map("map").setView([lat, lng], 14);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "© OpenStreetMap"
+        }).addTo(map);
+
+        // Marcador del usuario (Círculo azul para diferenciar de locales)
+        L.circleMarker([lat, lng], {
+            radius: 8,
+            fillColor: "#3498db",
+            color: "#fff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.8
+        }).addTo(map).bindPopup("<b>📍 Estás aquí</b>").openPopup();
+    }
+
+    function limpiarMarkers() {
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+    }
+
+    // 📦 CARGAR LOCALES DESDE API
+    async function cargarLocales() {
+        const cont = document.getElementById("locales-container");
+        if (!cont) return;
+
+        try {
+            const res = await fetch(`${API}/locales-con-ofertas`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true' // Vital para ngrok
+                }
+            });
+            
+            const data = await res.json();
+
+            cont.innerHTML = "";
+            limpiarMarkers();
+
+            if (!data || data.length === 0) {
+                cont.innerHTML = "<p class='no-results'>No hay locales disponibles en tu zona.</p>";
+                document.getElementById("total-locales").innerText = "0 locales encontrados";
+                return;
+            }
+
+            document.getElementById("total-locales").innerText = `${data.length} locales encontrados`;
+
+            data.forEach(l => {
+                // Crear Card para la lista
+                const card = document.createElement("div");
+                card.className = "local-card";
+                card.setAttribute("data-nombre", (l.nombre_comercial || "").toLowerCase());
+                card.setAttribute("data-direccion", (l.direccion || "").toLowerCase());
+
+                card.innerHTML = `
+                    <div class="card-image"><i class="fas fa-store fa-2x"></i></div>
+                    <div class="card-content">
+                        <h3>${l.nombre_comercial}</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> ${l.direccion || "Dirección no disponible"}</p>
+                        <div class="highlight-reward">🎁 ${l.total_recompensas} recompensas</div>
+                        <div class="card-footer">
+                            <div class="steps-info">
+                                <i class="fas fa-shoe-prints"></i>
+                                Desde <strong>${l.pasos_minimos || 0}</strong>
+                            </div>
+                            <a href="recompensas.html" class="btn-visit">Ver catálogo</a>
+                        </div>
+                    </div>`;
+
+                cont.appendChild(card);
+
+                // Agregar Marcador al mapa si tiene coordenadas
+                if (map && l.latitud && l.longitud) {
+                    const marker = L.marker([l.latitud, l.longitud])
+                        .addTo(map)
+                        .bindPopup(`
+                            <div style="text-align:center">
+                                <b>${l.nombre_comercial}</b><br>
+                                <small>${l.direccion}</small><br>
+                                <a href="recompensas.html" style="color:#3498db; font-weight:bold; text-decoration:none;">Ver Ofertas</a>
+                            </div>
+                        `);
+                    markers.push(marker);
+                }
+            });
+
+        } catch (error) {
+            console.error("Error cargando locales:", error);
+            cont.innerHTML = "<p class='error'>Hubo un error al conectar con el servidor.</p>";
+        }
+    }
+
+    // 🔍 FILTRO EN TIEMPO REAL
+    function filtrarLocales() {
+        const input = document.getElementById("local-search");
+        if (!input) return;
+        
+        const texto = input.value.toLowerCase();
+        const cards = document.querySelectorAll(".local-card");
+        let visibles = 0;
+
+        cards.forEach(c => {
+            const info = c.getAttribute("data-nombre") + " " + c.getAttribute("data-direccion");
+            const mostrar = info.includes(texto);
+            c.style.display = mostrar ? "flex" : "none";
+            if (mostrar) visibles++;
+        });
+
+        document.getElementById("total-locales").innerText = `${visibles} locales encontrados`;
+    }
+
+    // 🛰️ INICIO CON GEOLOCALIZACIÓN
+    document.addEventListener('DOMContentLoaded', () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    iniciarMapa(pos.coords.latitude, pos.coords.longitude);
+                    cargarLocales();
+                },
+                () => {
+                    // Coordenadas por defecto (García, NL) si el usuario niega el permiso
+                    console.warn("Acceso a ubicación denegado. Usando García, NL por defecto.");
+                    iniciarMapa(25.81, -100.59);
+                    cargarLocales();
+                }
+            );
+        } else {
+            // Caso: Navegador viejo
+            iniciarMapa(25.81, -100.59);
+            cargarLocales();
+        }
+    });
+
+    // 🖱️ GESTIÓN DE EVENTOS
+    document.addEventListener("click", (e) => {
+        if (e.target && e.target.id === "logout-btn") {
+            localStorage.removeItem("usuarioCaminataSana");
+            window.location.replace("../auth/INDEX.HTML");
+        }
+    });
+
+    // Escuchar cambios en la barra de búsqueda
+    const searchInput = document.getElementById("local-search");
+    if (searchInput) {
+        searchInput.addEventListener("input", filtrarLocales);
+    }
+</script>
+</body>
+</html>

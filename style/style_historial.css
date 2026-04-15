@@ -1,0 +1,212 @@
+:root {
+    --verde-salud: #2ecc71;
+    --verde-oscuro: #27ae60;
+    --azul-salud: #3498db;
+    --gris-fondo: #f8fafc; /* Un gris más moderno y limpio */
+    --gris-card: #ffffff;
+    --negro-texto: #1e293b; /* Reemplazo de #333 por un azul pizarra profundo */
+    --blanco: #ffffff;
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --degradado: linear-gradient(135deg, #2ecc71, #3498db);
+    --border-radius: 16px;
+}
+
+/* 1. RESET Y MEJORAS GLOBALES */
+* {
+    box-sizing: border-box; /* 🔥 CRUCIAL: Evita que el padding rompa el ancho */
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--gris-fondo);
+    color: var(--negro-texto);
+    line-height: 1.5;
+    overflow-x: hidden; /* 🔥 Evita scroll horizontal accidental */
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ================================
+    CONTENEDOR PRINCIPAL
+================================ */
+main {
+    padding: 120px 20px 60px; /* Más espacio arriba para la Navbar */
+    max-width: 1100px; /* Un ancho más contenido se ve más elegante */
+    margin: 0 auto;
+    width: 100%;
+    min-height: 100vh;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #0f172a;
+}
+
+/* ================================
+    ESTADÍSTICAS (Resumen)
+================================ */
+.stats {
+    display: grid; /* 🔥 Cambio de Flex a Grid para mejor control */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: var(--gris-card);
+    padding: 30px 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--verde-salud);
+}
+
+.stat-card h3 {
+    font-size: 2.5rem;
+    color: var(--verde-salud);
+    margin-bottom: 8px;
+    font-weight: 800;
+}
+
+.stat-card p {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ================================
+    SECCIÓN DE GRÁFICA
+================================ */
+.chart-container {
+    background: var(--gris-card);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 40px;
+    height: 400px; /* Un poco más de altura para legibilidad */
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    position: relative;
+}
+
+/* ================================
+    HISTORIAL DE ACTIVIDAD
+================================ */
+#filtro {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 30px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+#filtro:focus {
+    border-color: var(--verde-salud);
+    box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.1);
+    outline: none;
+}
+
+#historial-items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.item {
+    background: var(--gris-card);
+    padding: 20px 28px;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 6px solid var(--verde-salud); /* Simplificado el pseudo-elemento */
+    transition: transform 0.2s ease;
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.item:hover {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-hover);
+}
+
+.item span {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.item strong {
+    color: var(--negro-texto);
+    font-size: 1.1rem;
+}
+
+/* ================================
+    LOGROS Y BADGES
+================================ */
+.logros {
+    display: flex;
+    gap: 10px;
+    margin: 25px 0;
+    flex-wrap: wrap;
+}
+
+.badge {
+    background: var(--degradado);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.25);
+}
+
+/* ================================
+    ANIMACIONES
+================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================================
+    RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+    main { 
+        padding: 100px 15px 40px; 
+    }
+
+    h2 { font-size: 1.5rem; }
+
+    .item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+        padding: 20px;
+    }
+    
+    .stat-card h3 { font-size: 2rem; }
+}

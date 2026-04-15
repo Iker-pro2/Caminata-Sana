@@ -1,0 +1,136 @@
+:root {
+    --primary: #2ecc71;
+    --primary-dark: #27ae60;
+    --dark: #1a2a3a;
+    --light-bg: #f8fafc;
+    --white: #ffffff;
+    --glass: rgba(255, 255, 255, 0.8);
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: var(--light-bg);
+    color: var(--dark);
+    /* El padding-top se mantiene si vas a usar un navbar fijo después */
+    padding-top: 70px; 
+}
+
+/* ================================
+    HERO SECTION
+================================ */
+.hero-section {
+    background: linear-gradient(135deg, #08d195, #064e3b);
+    padding: 120px 6% 160px;
+    text-align: center;
+    color: white;
+}
+
+.hero-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+/* ================================
+    MAPA (Leaflet)
+================================ */
+#map {
+    height: 350px;
+    max-width: 1000px;
+    margin: auto;
+    border-radius: 30px;
+    box-shadow: var(--shadow);
+    border: 5px solid white;
+}
+
+/* ================================
+    CONTENEDOR Y TARJETAS
+================================ */
+.container {
+    max-width: 1100px;
+    margin: -80px auto 60px;
+    padding: 0 20px;
+}
+
+.locales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.local-card {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease;
+}
+
+.local-card:hover {
+    transform: translateY(-10px);
+}
+
+.icon-box {
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-gold { background: #fefce8; }
+.bg-green { background: #f0fdf4; }
+
+/* ================================
+    SIMULADOR DE PASOS
+================================ */
+#simulador {
+    margin-top: 40px;
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: var(--shadow);
+}
+
+#cantidad_pasos {
+    padding: 15px;
+    border-radius: 15px;
+    border: 2px solid #e2e8f0;
+    width: 100%;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.btn-visit {
+    padding: 15px 30px;
+    border-radius: 15px;
+    background: var(--dark);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.3s;
+}
+
+.btn-visit:hover {
+    background: var(--primary-dark);
+}
+
+/* ================================
+    FOOTER
+================================ */
+footer {
+    text-align: center;
+    padding: 30px;
+    color: #94a3b8;
+    font-size: 14px;
+}

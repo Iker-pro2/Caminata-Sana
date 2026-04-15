@@ -1,0 +1,518 @@
+/* ================= VARIABLES (Ajustadas a CaminataSana) ================= */
+:root {
+  --primary-green: #2ecc71;
+  --primary-green-dark: #27ae60;
+
+  --bg-nav: #ffffff;
+  --clr-text: #334155;
+  --unit: 60px; /* Tamaño del círculo indicador */
+  --nav-height: 70px;
+  --transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ================= BASE ================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  padding-top: var(--nav-height); /* Espacio para el logo arriba en PC */
+}
+
+/* ================= NAVBAR CONTENEDOR ================= */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--nav-height);
+  background: var(--bg-nav);
+  z-index: 2000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+}
+
+.navbar-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  color: var(--clr-text);
+}
+
+.logo img { height: 35px; }
+
+/* ================= ESCRITORIO (PC) ================= */
+@media (min-width: 851px) {
+  .navigation ul {
+    display: flex;
+    gap: 10px;
+    list-style: none;
+  }
+  
+  .indicator { display: none; } /* Oculto en escritorio */
+
+  .navigation ul li a, 
+  .nav-btn-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--clr-text);
+    padding: 10px 15px;
+    border-radius: 12px;
+    transition: 0.3s;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .navigation ul li.active a {
+    color: var(--primary-green);
+    background: rgba(46, 204, 113, 0.1);
+  }
+
+  .navigation ul li a:hover {
+    background: rgba(0,0,0,0.03);
+  }
+}
+
+/* ================= MÓVIL (MAGIC MENU & RESPONSIVE) ================= */
+@media (max-width: 850px) {
+  body {
+    padding-bottom: 110px; /* Espacio para que el menú no tape contenido */
+  }
+
+  :root {
+    --bg-nav: #ffffff;
+    --clr-text: #334155;
+    --transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --unit: 60px; /* Tamaño del círculo indicador */
+    --nav-height: 70px;
+    --nav-items: 6; /* ASEGÚRATE: Que este número coincida con tus <li> */
+  }
+
+  /* CONTENEDOR DE NAVEGACIÓN */
+  .navigation {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(95vw, 420px);
+    height: var(--nav-height);
+    background: var(--bg-nav);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    z-index: 2100;
+  }
+
+  .navigation ul {
+    display: flex;
+    width: 100%;
+    padding: 0; /* Eliminado padding lateral para evitar desfases */
+    margin: 0;
+    list-style: none;
+    position: relative;
+  }
+
+  .navigation ul li {
+    flex: 1;
+    height: var(--nav-height);
+    position: relative;
+    z-index: 1;
+  }
+
+  .navigation ul li a,
+  .nav-btn-link {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    background: none;
+    border: none;
+    color: var(--clr-text);
+    cursor: pointer;
+    position: relative;
+  }
+
+  /* ICONOS */
+  .navigation ul li a .icon,
+  .nav-btn-link .icon {
+    display: block;
+    line-height: var(--nav-height);
+    font-size: 1.5rem;
+    text-align: center;
+    transition: var(--transition);
+    color: var(--clr-text);
+  }
+
+  .navigation ul li.active a .icon {
+    transform: translateY(-32px); /* Ajustado para quedar en el centro del indicador */
+    color: #ffffff;
+  }
+
+  /* TEXTO */
+  .navigation ul li a .text,
+  .nav-btn-link .text {
+    position: absolute;
+    color: var(--primary-green);
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    transition: var(--transition);
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .navigation ul li.active a .text {
+    opacity: 1;
+    transform: translateY(10px);
+  }
+
+  /* INDICADOR MÁGICO */
+  .indicator {
+    position: absolute;
+    top: -50%; /* Lo posiciona justo a la mitad superior */
+    width: var(--unit);
+    height: var(--unit);
+    background: var(--primary-green);
+    border-radius: 50%;
+    border: 6px solid var(--bg-nav);
+    transition: var(--transition);
+    z-index: 0;
+
+    /* Cálculo exacto basado en el número de items */
+    left: calc((100% / var(--nav-items)) * var(--x) + 
+               (100% / var(--nav-items) / 2) - 
+               (var(--unit) / 2));
+  }
+
+  /* MODALES Y PERFIL */
+  .custom-modal-content {
+    width: 95%;
+    padding: 20px;
+    margin-bottom: 90px;
+  }
+
+  .profile-pic-wrapper img {
+    width: 90px;
+    height: 90px;
+  }
+}
+/* ================= COMPLEMENTOS (Bottom Sheet) ================= */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(34, 34, 34, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2500;
+  transition: 0.3s;
+}
+
+.sheet-overlay.active { 
+  opacity: 1; 
+  pointer-events: all; 
+}
+
+.bottom-sheet {
+  position: fixed;
+  left: 0;
+  bottom: -100%;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 25px 25px 0 0;
+  z-index: 3000;
+  padding: 20px;
+  transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* TEXTO NEGRO */
+  color: #000000;
+}
+
+.bottom-sheet.active { 
+  bottom: 0; 
+}
+/* ================= MODALES (Perfil y Ayuda) ================= */
+
+/* Fondo del modal */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px); /* Efecto de desenfoque al fondo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 4000; /* Por encima de la navegación y el bottom sheet */
+}
+
+.custom-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Caja blanca del modal */
+.custom-modal-content {
+  background: var(--bg-nav);
+  width: 90%;
+  max-width: 420px;
+  border-radius: 20px;
+  padding: 30px;
+  position: relative;
+  transform: scale(0.9);
+  transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.custom-modal-overlay.active .custom-modal-content {
+  transform: scale(1);
+}
+
+/* Botón cerrar (X) */
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--clr-text);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: 0.2s;
+}
+
+.close-modal:hover { opacity: 1; }
+
+.custom-modal-content h2 {
+  margin-bottom: 20px;
+  color: var(--clr-text);
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+/* --- FORMULARIO DE PERFIL ACTUALIZADO --- */
+.profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 10px;
+}
+
+/* Foto de Perfil con botón flotante */
+.profile-pic-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 5px;
+}
+
+.profile-pic-wrapper img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--primary-green);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-icon-edit {
+  position: absolute;
+  bottom: 45px;
+  right: calc(50% - 55px);
+  background: var(--primary-green);
+  color: white;
+  border: 3px solid white;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+/* Filas de Input + Botón Independiente */
+.input-group-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.input-field {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-field label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--clr-text);
+  margin-left: 5px;
+}
+
+.input-field input {
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  outline: none;
+  font-family: inherit;
+  transition: 0.3s;
+  background: #f8fafc;
+}
+
+.input-field input:focus {
+  border-color: var(--primary-green);
+  background: white;
+}
+
+/* Botones de Actualización (Cambiar) */
+.btn-update-field {
+  padding: 12px 15px;
+  background: var(--primary-green);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.3s;
+  height: 48px; /* Para alinear con el input */
+}
+
+.btn-update-field:active {
+  transform: scale(0.95);
+}
+
+/* Separador */
+.separator {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 10px 0;
+}
+
+/* Enlace de Seguridad (Contraseña) */
+.btn-security-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  background: #f1f5f9;
+  color: #475569;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: 0.3s;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-security-link ion-icon {
+  font-size: 1.2rem;
+}
+
+.btn-security-link:hover {
+  background: #e2e8f0;
+  color: var(--primary-green-dark);
+}
+
+/* Estilo para el botón de confirmación en otros modales */
+.btn-guardar {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary-green);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* --- SECCIÓN DE AYUDA (FAQ) --- */
+.faq-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faq-container details {
+  background: var(--bg-app);
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.faq-container details[open] {
+  background: #fff;
+  border: 1px solid var(--primary-green);
+}
+
+.faq-container summary {
+  font-weight: 600;
+  color: var(--clr-text);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faq-container summary::after {
+  content: '▼';
+  font-size: 0.7rem;
+  transition: 0.3s;
+  display: inline-block;
+}
+
+.faq-container details[open] summary::after {
+  transform: rotate(180deg);
+  color: var(--primary-green);
+}
+
+.faq-container p {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* Ajuste para que los modales no choquen con el menú móvil */
+@media (max-width: 850px) {
+  .custom-modal-content {
+    margin-bottom: 80px; /* Sube un poco el modal para dejar espacio al menú circular */
+  }
+}

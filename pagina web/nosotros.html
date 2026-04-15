@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style/Nosotros.css">
+    <title>Conócenos - Caminata Sana</title>
+</head>
+<body>
+<header class="head">
+    <div class="logo">
+        <img src="../img/logo.png" alt="Logo">
+        <a href="Caminata Sana.html">CAMINATA<span>SANA</span></a>
+    </div>
+
+    <!-- BOTÓN HAMBURGUESA -->
+    <div class="menu-toggle" id="menu-toggle">
+        ☰
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <a href="Caminata Sana.html">Inicio</a>
+        <a href="Registro_Locales.html">Registro locales</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="../auth/Regristrate.html">Regístrate</a>
+        <a href="../auth/index.html" class="btn-login">Iniciar sesión</a>
+    </nav>
+</header>
+
+    <main class="nosotros-container">
+        <section class="hero-nosotros">
+            <h1>Quiénes Somos: Caminata Sana</h1>
+            <p>En <strong>Caminata Sana</strong>, transformamos el movimiento cotidiano en bienestar tangible. Somos una plataforma tecnológica dedicada a combatir el sedentarismo mediante una experiencia de geolocalización que motiva a las personas a mantenerse activas mientras fortalecen el comercio local.</p>
+        </section>
+
+        <hr>
+
+        <section class="pilares">
+            <h2>Nuestros Pilares</h2>
+            <div class="grid-pilares">
+                <div class="pilar-card">
+                    <h3>Salud Integral</h3>
+                    <p>Incentivamos la actividad física diaria como base para una vida más saludable y equilibrada.</p>
+                </div>
+                <div class="pilar-card">
+                    <h3>Impulso Local</h3>
+                    <p>Creamos un puente estratégico entre los ciudadanos y los negocios de la zona, generando tráfico de clientes reales.</p>
+                </div>
+                <div class="pilar-card">
+                    <h3>Tecnología con Propósito</h3>
+                    <p>Usamos geolocalización de vanguardia para crear un ecosistema seguro y transparente para todos.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="afiliacion-info">
+            <h2>Conviértete en un Negocio Aliado</h2>
+            <p>Forma parte de nuestra red de beneficios y posiciona tu marca como una empresa que apoya el bienestar de la comunidad.</p>
+            <h3></h3>
+            <div class="cta-container">
+                <a href="Registro_Locales.html" class="btn-afiliacion">Unirse a la Red de Beneficios</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer-simple">
+        <p>&copy; 2026 Caminata Sana - Proyecto Integrador UTSC</p>
+    </footer>
+<script>
+const toggle = document.getElementById("menu-toggle");
+const navbar = document.getElementById("navbar");
+
+toggle.addEventListener("click", () => {
+    navbar.classList.toggle("active");
+
+    if (navbar.classList.contains("active")) {
+        toggle.textContent = "✖";
+    } else {
+        toggle.textContent = "☰";
+    }
+});
+</script>
+</body>
+</html>

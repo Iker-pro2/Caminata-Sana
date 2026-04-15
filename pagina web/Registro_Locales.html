@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Locales | Caminata Sana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../style/Registro_locales.css">
+</head>
+<body>
+
+<header class="head">
+    <div class="logo">
+        <img src="../img/logo.png" alt="Logo">
+        <a href="Caminata Sana.html">CAMINATA<span>SANA</span></a>
+    </div>
+
+    <!-- BOTÓN HAMBURGUESA -->
+    <div class="menu-toggle" id="menu-toggle">
+        ☰
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <a href="Caminata Sana.html">Inicio</a>
+        <a href="Registro_Locales.html">Registro locales</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="../auth/Regristrate.html">Regístrate</a>
+        <a href="../auth/index.html" class="btn-login">Iniciar sesión</a>
+    </nav>
+</header>
+
+<section id="afiliacion" class="afiliacion-container">
+    <div class="form-header">
+        <h2>Afilia tu Negocio</h2>
+        <p>Únete a la red de comercios que impulsan la salud en García, Nuevo León.</p>
+    </div>
+
+    <div class="afiliacion-grid">
+        <form id="registro-local-form" class="registro-form">
+
+            <div class="input-group">
+                <label><i class="fas fa-store"></i> Nombre del Negocio</label>
+                <input type="text" id="nombre-negocio" required>
+            </div>
+
+            <div class="input-group">
+                <label><i class="fas fa-tag"></i> Categoría</label>
+                <select id="categoria-negocio" required>
+                    <option value="">Selecciona una categoría</option>
+                    <option value="Cafetería">Cafetería</option>
+                    <option value="Gimnasio">Gimnasio</option>
+                    <option value="Salud">Salud/Bienestar</option>
+                    <option value="Restaurante">Restaurante</option>
+                    <option value="Tienda">Tienda</option>
+                    <option value="Personalización">Personalización / Regalos</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label><i class="fas fa-gift"></i> Recompensa propuesta</label>
+                <input type="text" id="recompensa" required>
+            </div>
+
+            <div class="input-group">
+                <label><i class="fas fa-envelope"></i> Correo</label>
+                <input type="email" id="email" required>
+            </div>
+
+            <div class="input-group">
+                <label><i class="fas fa-phone"></i> Teléfono</label>
+                <input type="tel" id="telefono">
+            </div>
+
+            <div class="input-group">
+                <label><i class="fas fa-map-marker-alt"></i> Dirección</label>
+                <input type="text" id="direccion">
+            </div>
+
+            <!-- BOTÓN DE UBICACIÓN -->
+            <div class="input-group">
+                <button type="button" id="btn-ubicacion">
+                    📍 Usar mi ubicación actual
+                </button>
+                <small id="estado-ubicacion"></small>
+            </div>
+
+            <div class="input-group">
+                <label><i class="fas fa-walking"></i> Pasos</label>
+                <input type="number" id="pasos" value="5000">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="acepto-terminos" required>
+                <label>Acepto los términos</label>
+            </div>
+
+            <button type="submit" id="btn-enviar" class="btn-submit">
+            Enviar Solicitud
+            </button>
+
+            <div id="mensaje-confirmacion" style="display:none; margin-top:10px;"></div>
+
+        </form>
+    </div>
+</section>
+
+<script>
+const form = document.getElementById('registro-local-form');
+const mensaje = document.getElementById('mensaje-confirmacion');
+const btn = document.getElementById('btn-enviar');
+
+const btnUbicacion = document.getElementById('btn-ubicacion');
+const estadoUbicacion = document.getElementById('estado-ubicacion');
+
+// Variables globales
+let latitud = null;
+let longitud = null;
+
+// 📍 Obtener ubicación
+btnUbicacion.addEventListener('click', () => {
+    estadoUbicacion.innerText = "Obteniendo ubicación...";
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                latitud = position.coords.latitude;
+                longitud = position.coords.longitude;
+
+                estadoUbicacion.innerText = "✅ Ubicación obtenida";
+                console.log("Lat:", latitud, "Lng:", longitud);
+            },
+            (error) => {
+                estadoUbicacion.innerText = "❌ No se pudo obtener la ubicación";
+            }
+        );
+    } else {
+        estadoUbicacion.innerText = "⚠️ Geolocalización no soportada";
+    }
+});
+
+// 🚀 Enviar formulario
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    btn.disabled = true;
+    btn.innerText = "Enviando...";
+
+    const data = {
+        nombre_negocio: document.getElementById('nombre-negocio').value,
+        categoria: document.getElementById('categoria-negocio').value,
+        recompensa_ofrecida: document.getElementById('recompensa').value,
+        email_contacto: document.getElementById('email').value,
+        telefono: document.getElementById('telefono').value || null,
+        direccion_propuesta: document.getElementById('direccion').value || null,
+        pasos_requeridos: parseInt(document.getElementById('pasos').value) || 5000,
+        latitud: latitud,
+        longitud: longitud
+    };
+
+    try {
+        const resp = await fetch('http://192.168.0.17:3000/api/solicitar-afiliacion', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await resp.json();
+
+        mensaje.style.display = 'block';
+
+        if(resp.ok){
+            mensaje.style.color = 'green';
+            mensaje.innerText = "✅ Solicitud enviada correctamente";
+            form.reset();
+            estadoUbicacion.innerText = "";
+            latitud = null;
+            longitud = null;
+        } else {
+            mensaje.style.color = 'red';
+            mensaje.innerText = result.error || "Error en datos";
+        }
+
+    } catch (error) {
+        mensaje.style.display = 'block';
+        mensaje.style.color = 'red';
+        mensaje.innerText = "⚠️ Error de conexión con el servidor";
+    }
+
+    btn.disabled = false;
+    btn.innerText = "Enviar Solicitud";
+});
+</script>
+<script>
+const toggle = document.getElementById("menu-toggle");
+const navbar = document.getElementById("navbar");
+
+toggle.addEventListener("click", () => {
+    navbar.classList.toggle("active");
+
+    if (navbar.classList.contains("active")) {
+        toggle.textContent = "✖";
+    } else {
+        toggle.textContent = "☰";
+    }
+});
+</script>
+</body>
+</html>

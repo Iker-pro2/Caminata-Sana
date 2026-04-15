@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caminata Sana - Recompensas</title>
+
+    <script>
+        const usuario = JSON.parse(localStorage.getItem('usuarioCaminataSana'));
+        if (!usuario) {
+            window.location.replace('../auth/INDEX.HTML');
+        }
+    </script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="../style/style_Recompensas.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../style/navbar.css">
+</head>
+
+<body>
+
+    <script src="navbar.js"></script>
+
+    <header class="main-header">
+        <div class="header-title">
+            <h1>Catálogo</h1>
+            <p>Canjea tus pasos por recompensas</p>
+        </div>
+
+        <div class="user-info">
+            <div class="username" id="username"></div>
+            <div class="saldo-label">TU SALDO</div>
+            <div class="saldo-puntos" id="saldo">0 PASOS</div>
+        </div>
+    </header>
+
+    <main class="recompensas-grid" id="recompensas-container">
+        <div class="loading">Cargando recompensas...</div>
+    </main>
+
+    <script>
+    // 🌐 CONFIGURACIÓN: Usando tu URL activa de ngrok
+    const API = "https://mercilessly-micellar-annika.ngrok-free.dev/api";
+    const usuarioLogueado = JSON.parse(localStorage.getItem('usuarioCaminataSana'));
+    const userId = usuarioLogueado?.id;
+
+    // 👤 Mostrar nombre
+    if (usuarioLogueado) {
+        document.getElementById("username").innerText = "Hola, " + usuarioLogueado.nombre;
+    }
+
+    // 🔄 Cargar saldo + recompensas
+    async function cargarDatos() {
+        try {
+            // 💰 SALDO
+            const respSaldo = await fetch(`${API}/usuario/saldo/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true' // Vital para que funcione en móviles
+                }
+            });
+            
+            const saldoData = await respSaldo.json();
+            let saldoActual = 0;
+
+            if (respSaldo.ok) {
+                saldoActual = saldoData.saldo_actual_pasos || 0;
+                document.getElementById("saldo").innerText =
+                    saldoActual.toLocaleString() + " PASOS";
+            }
+
+            // 🎁 RECOMPENSAS
+            const resp = await fetch(`${API}/recompensas-disponibles`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            });
+            
+            const data = await resp.json();
+
+            if (!resp.ok) throw new Error("Error al cargar recompensas");
+
+            console.log("Recompensas cargadas:", data);
+            renderizar(data, saldoActual);
+
+        } catch (err) {
+            console.error("Error en cargarDatos:", err);
+            document.getElementById("recompensas-container").innerHTML =
+                `<div class="loading">Error al conectar con el servidor. Revisa tu conexión a ngrok.</div>`;
+        }
+    }
+
+    // 🎨 RENDER (Se mantiene igual, pero con limpieza de IDs)
+    function renderizar(lista, saldo) {
+        const container = document.getElementById("recompensas-container");
+        container.innerHTML = "";
+
+        if (lista.length === 0) {
+            container.innerHTML = `<div class="loading">No hay recompensas disponibles en este momento.</div>`;
+            return;
+        }
+
+        lista.forEach(recom => {
+            const esAlcanzable = saldo >= recom.pasos_necesarios;
+
+            container.innerHTML += `
+            <div class="reward-card ${esAlcanzable ? 'alcanzable' : 'bloqueada'}">
+                <div class="reward-header">
+                    <div class="reward-local">
+                        <i class="fas fa-store"></i> ${recom.nombre_local}
+                    </div>
+                    <h3 class="reward-titulo">
+                        ${recom.nombre_recompensa || 'Recompensa'}
+                    </h3>
+                    <p class="reward-desc">
+                        ${recom.descripcion || 'Disfruta esta recompensa exclusiva'}
+                    </p>
+                </div>
+                <div class="reward-footer">
+                    <div>
+                        <div class="costo-puntos">
+                            ${recom.pasos_necesarios.toLocaleString()}
+                        </div>
+                        <span class="costo-label">PASOS</span>
+                    </div>
+                    <button class="btn-canjear" 
+                        data-id="${recom.recompensa_id}"
+                        ${esAlcanzable ? '' : 'disabled'}>
+                        ${esAlcanzable ? 'Canjear' : 'Faltan pasos'}
+                    </button>
+                </div>
+            </div>`;
+        });
+    }
+
+    // 🎫 EJECUTAR CANJE
+    async function ejecutarCanje(id) {
+        if (!confirm("¿Seguro que quieres canjear esta recompensa? Los pasos se descontarán de tu saldo.")) return;
+
+        try {
+            const res = await fetch(`${API}/canjear`, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "true" 
+                },
+                body: JSON.stringify({
+                    usuario_id: userId,
+                    recompensa_id: id
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("🎉 ¡Canje exitoso!\nCódigo: " + data.codigo);
+                cargarDatos(); // Recargar saldo y lista
+            } else {
+                alert(data.error || "No se pudo realizar el canje");
+            }
+
+        } catch (error) {
+            console.error("Error en canje:", error);
+            alert("❌ Error de conexión. Verifica que el servidor esté activo.");
+        }
+    }
+
+    // 🖱️ EVENTOS
+    document.addEventListener("click", (e) => {
+        // Logout
+        if (e.target && e.target.id === "logout-btn") {
+            localStorage.removeItem("usuarioCaminataSana");
+            window.location.replace("../auth/INDEX.HTML");
+        }
+
+        // Canjear
+        if (e.target && e.target.classList.contains("btn-canjear")) {
+            const id = e.target.getAttribute("data-id");
+            ejecutarCanje(id);
+        }
+    });
+
+    // 🚀 INICIO
+    cargarDatos();
+</script>
+
+</body>
+</html>

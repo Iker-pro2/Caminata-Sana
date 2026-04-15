@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Caminata Sana</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Caminata Sana</h2>
+        <p>Admin: <strong id="admin-name">Cargando...</strong></p>
+        <hr>
+        <nav>
+            <a href="dashboard.html" class="active">🏠 Inicio</a>
+            <a href="solicitudes.html">📩 Solicitudes</a>
+            <a href="Locales.html">🏪Locales Aliados</a>
+            <a href="usuarios.html">👥 Usuarios</a>
+            <a href="#" onclick="logout()" class="logout-btn">🚪 Cerrar Sesión</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="welcome-box">
+            <h1>¡Bienvenido, <span id="welcome-name">Admin</span>! 👋</h1>
+            <p>Este es el estado actual del proyecto "Caminata Sana" en García, N.L.</p>
+        </div>
+
+        <div class="widgets-grid">
+            <div class="widget-card">
+                <div class="widget-icon">👥</div>
+                <div class="widget-info">
+                    <h3>Usuarios Totales</h3>
+                    <p id="dash-usuarios">0</p>
+                </div>
+            </div>
+
+            <div class="widget-card card-blue">
+                <div class="widget-icon">👣</div>
+                <div class="widget-info">
+                    <h3>Pasos Globales</h3>
+                    <p id="dash-pasos">0</p>
+                </div>
+            </div>
+
+            <div class="widget-card card-yellow">
+                <div class="widget-icon">📩</div>
+                <div class="widget-info">
+                    <h3>Locales Aliados</h3>
+                    <p id="dash-solicitudes">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h2>Actividad Reciente</h2>
+            <p>Utiliza el menú lateral para gestionar los negocios o revisar el ranking de caminantes detallado.</p>
+            <div class="action-buttons">
+                <button class="btn-approve" onclick="location.href='solicitudes.html'">Revisar Solicitudes</button>
+                <button class="btn-ranking" onclick="location.href='usuarios.html'">Ver Ranking</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+const API_URL = "https://mercilessly-micellar-annika.ngrok-free.dev";
+
+// 🔑 IMPORTANTE: Debe ser la misma clave que usas en el Login
+const STORAGE_KEY = "usuarioCaminataSana"; 
+
+// 🔐 VALIDAR SESIÓN REAL
+function verificarSesion() {
+    const token = localStorage.getItem("token");
+    const usuarioRaw = localStorage.getItem(STORAGE_KEY); // <-- Cambiado aquí
+
+    if (!token || !usuarioRaw) {
+        console.warn("No se encontró token o usuario en localStorage");
+        redirigirLogin();
+        return null;
+    }
+
+    try {
+        const user = JSON.parse(usuarioRaw);
+
+        // Verificamos que el usuario exista y que sea admin (rol_id 1)
+        if (!user || user.rol_id !== 1) {
+            console.error("Acceso denegado: El usuario no es administrador.");
+            redirigirLogin();
+            return null;
+        }
+
+        // Mostrar nombre en los elementos del HTML
+        if(document.getElementById('admin-name')) document.getElementById('admin-name').innerText = user.nombre;
+        if(document.getElementById('welcome-name')) document.getElementById('welcome-name').innerText = user.nombre;
+
+        return token;
+
+    } catch (e) {
+        console.error("Error al parsear el usuario:", e);
+        redirigirLogin();
+        return null;
+    }
+}
+
+function redirigirLogin() {
+    alert("⛔ Sesión inválida");
+    localStorage.clear();
+    // Asegúrate de que esta ruta sea correcta según tu estructura de carpetas
+    window.location.href = "../../auth/INDEX.HTML"; 
+}
+
+// 🚪 LOGOUT
+function logout() {
+    if (confirm("¿Cerrar sesión?")) {
+        localStorage.clear(); // Limpia todo para seguridad
+        window.location.href = "../../auth/INDEX.HTML";
+    }
+}
+
+// 📊 DASHBOARD SEGURO
+async function cargarDashboard() {
+    const token = verificarSesion();
+    if (!token) return;
+
+    try {
+        const response = await fetch(`${API_URL}/api/admin/stats`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'ngrok-skip-browser-warning': 'true' // Evita que ngrok bloquee la carga
+            }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            throw new Error("Sesión expirada o token inválido");
+        }
+
+        const stats = await response.json();
+
+        // Actualizar UI con datos reales
+        document.getElementById('dash-usuarios').innerText = (stats.usuariosTotales || 0).toLocaleString();
+        document.getElementById('dash-pasos').innerText = (stats.pasosGlobales || 0).toLocaleString();
+        document.getElementById('dash-solicitudes').innerText = (stats.pendientes || 0).toLocaleString();
+
+    } catch (error) {
+        console.error("❌ Error al cargar stats:", error);
+
+        if (error.message.includes("Sesión") || error.message.includes("expirada")) {
+            redirigirLogin();
+        }
+
+        // Valores por defecto en caso de error
+        document.getElementById('dash-usuarios').innerText = "--";
+        document.getElementById('dash-pasos').innerText = "--";
+        document.getElementById('dash-solicitudes').innerText = "--";
+    }
+}
+
+// 🚀 INIT
+window.onload = cargarDashboard;
+</script>
+
+
+</body>
+</html>

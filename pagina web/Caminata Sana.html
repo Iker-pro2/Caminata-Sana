@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caminata Sana | Camina y Gana</title>
+    <link rel="stylesheet" href="../style/Caminata.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<header class="head">
+    <div class="logo">
+        <img src="../img/logo.png" alt="Logo">
+        <a href="Caminata Sana.html">CAMINATA<span>SANA</span></a>
+    </div>
+
+    <!-- BOTÓN HAMBURGUESA -->
+    <div class="menu-toggle" id="menu-toggle">
+        ☰
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <a href="Caminata Sana.html">Inicio</a>
+        <a href="Registro_Locales.html">Registro locales</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="../auth/Regristrate.html">Regístrate</a>
+        <a href="../auth/index.html" class="btn-login">Iniciar sesión</a>
+    </nav>
+</header>
+
+    <section class="header-content">
+        <h1 class="title">Tus pasos tienen premio</h1>
+        <p>Convierte tu caminata diaria en descuentos reales. Únete a la comunidad que cuida su salud y apoya a los negocios locales de Santa Catarina.</p>
+        <div class="btn-home">
+            <a href="#beneficios" class="btn">¿Cómo funciona?</a>
+        </div>
+    </section>
+
+    <section id="beneficios" class="content products">
+        <h2 class="title">¿Tienes un local? Hazte socio</h2>
+        <div class="box-container">
+            <div class="box">
+                <i class="fas fa-bullhorn"></i>
+                <h3>Publicidad Gratis</h3>
+                <p>Miles de usuarios verán tu negocio en nuestro mapa interactivo al caminar cerca.</p>
+            </div>
+            <div class="box">
+                <i class="fas fa-users"></i>
+                <h3>Nuevos Clientes</h3>
+                <p>Atrae personas a tu establecimiento mediante recompensas por actividad física.</p>
+            </div>
+            <div class="box">
+                <i class="fas fa-chart-line"></i>
+                <h3>Crecimiento</h3>
+                <p>Aumenta tus ventas mientras fomentas hábitos saludables en tu comunidad.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="registro-locales" class="content survey-intro">
+        <div class="intro-container">
+            <h2 class="title">SOLICITUD DE AFILIACIÓN</h2>
+            <p class="subtitle">Envía tus datos para que el administrador revise tu local.</p>
+            
+            <div class="info-text">
+                <p>¿Quieres que tu negocio aparezca en nuestro mapa y atraer a cientos de usuarios activos? Únete a la red de <strong>Caminata Sana</strong> y fomenta el comercio local mientras premias la salud.</p>
+            </div>
+    
+            <a href="Registro_Locales.html" class="btn btn-primary">Llenar Encuesta de Afiliación</a>
+        </div>
+    </section>
+
+    <section class="content about">
+        <h2 class="title">Sobre Caminata Sana</h2>
+        <p>Somos un equipo de la <strong>UTSC</strong> apasionado por la tecnología y el bienestar social. Nuestra misión es reducir el sedentarismo conectando locales con gente activa.</p>
+        <a href="nosotros.html" class="btn">Conoce al equipo</a>
+    </section>
+
+    <footer class="content contact">
+        <h2 class="title">Contacto</h2>
+        <p>Ubicación: Santa Catarina, Nuevo León | Email: soporte@caminatasana.com</p>
+    </footer>
+
+<script>
+const toggle = document.getElementById("menu-toggle");
+const navbar = document.getElementById("navbar");
+
+toggle.addEventListener("click", () => {
+    navbar.classList.toggle("active");
+
+    if (navbar.classList.contains("active")) {
+        toggle.textContent = "✖";
+    } else {
+        toggle.textContent = "☰";
+    }
+});
+</script>
+</body>
+</html>

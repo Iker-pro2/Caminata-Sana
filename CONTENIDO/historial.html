@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Caminata Sana - Historial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style/style_historial.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../style/navbar.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+</head>
+<body>
+    <script src="navbar.js"></script>
+    <main>
+        <header>
+            <h2 style="margin-top: 20px;">Mi Historial</h2>
+        </header>
+
+        <section class="stats">
+            <div class="stat-card">
+                <h3 id="total-pasos">0</h3>
+                <p>Pasos totales</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="dias-activos">0</h3>
+                <p>Días activos</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="racha-val">0</h3> 
+                <p>Racha 🔥</p>
+            </div>
+        </section>
+
+        <section class="chart-container" style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; height: 300px;">
+            <canvas id="grafica"></canvas>
+        </section>
+
+        <section class="filters" style="margin-bottom: 20px;">
+            <label for="filtro">Filtrar por fecha:</label>
+            <input type="date" id="filtro">
+        </section>
+
+        <section class="logros" style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <div class="badge">1k pasos</div>
+            <div class="badge">Constante</div>
+            <div class="badge">Activo</div>
+        </section>
+
+        <div id="historial-items" class="historial-container">
+            </div>
+    </main>
+
+    <script>
+        // Constantes de configuración
+const CONFIG = {
+    API_BASE: "https://mercilessly-micellar-annika.ngrok-free.dev/api",
+    STORAGE_KEY: 'usuarioCaminataSana',
+    HEADERS: { 'ngrok-skip-browser-warning': 'true' }
+};
+
+// Estado de la aplicación
+const state = {
+    usuario: JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEY)),
+    chart: null,
+    datosCompletos: []
+};
+
+// Redirección inmediata si no hay usuario
+if (!state.usuario) window.location.replace('../auth/INDEX.HTML');
+
+/**
+ * Inicializador de la página
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+    setupEventListeners();
+});
+
+async function initApp() {
+    const contenedor = document.getElementById("historial-items");
+    contenedor.innerHTML = "<p>Cargando tu progreso...</p>";
+
+    try {
+        // Ejecución en paralelo para mejorar el tiempo de respuesta
+        const [resResumen, resDetalle] = await Promise.all([
+            fetch(`${CONFIG.API_BASE}/usuario/historial-resumen/${state.usuario.id}`, { headers: CONFIG.HEADERS }),
+            fetch(`${CONFIG.API_BASE}/usuario/historial-detallado/${state.usuario.id}`, { headers: CONFIG.HEADERS })
+        ]);
+
+        const resumen = await resResumen.json();
+        state.datosCompletos = await resDetalle.json();
+
+        updateUIResumen(resumen);
+        renderHistorial(state.datosCompletos);
+        initChart(state.datosCompletos);
+        calcularRacha(state.datosCompletos);
+
+    } catch (error) {
+        console.error("Error al inicializar:", error);
+        contenedor.innerHTML = "<p class='error'>Hubo un problema al conectar con el servidor.</p>";
+    }
+}
+
+/**
+ * Actualiza los contadores superiores
+ */
+function updateUIResumen(data) {
+    document.getElementById("total-pasos").innerText = `${(data.total_pasos || 0).toLocaleString()} pasos`;
+    document.getElementById("dias-activos").innerText = `${data.total_dias || 0} días`;
+}
+
+/**
+ * Renderiza la lista de items en el DOM
+ */
+function renderHistorial(lista) {
+    const contenedor = document.getElementById("historial-items");
+    contenedor.innerHTML = "";
+
+    if (lista.length === 0) {
+        contenedor.innerHTML = "<p>No hay datos registrados aún. ¡A caminar!</p>";
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    lista.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.dataset.fecha = item.fecha; // Para facilitar el filtrado
+        div.style = "display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f0f0f0;";
+        
+        div.innerHTML = `
+            <span><i class="fas fa-calendar-alt"></i> ${formatearFecha(item.fecha)}</span>
+            <span><strong>${item.cantidad_pasos.toLocaleString()}</strong> <small>PASOS</small> <i class="fas fa-shoe-prints" style="color: #2ecc71;"></i></span>
+        `;
+        fragment.appendChild(div);
+    });
+    contenedor.appendChild(fragment);
+}
+
+/**
+ * Configuración de la gráfica
+ */
+function initChart(lista) {
+    const ctx = document.getElementById("grafica").getContext("2d");
+    const dataReverse = [...lista].reverse(); // No mutamos el array original
+
+    if (state.chart) state.chart.destroy();
+
+    state.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dataReverse.map(i => i.fecha),
+            datasets: [{
+                label: 'Pasos Diarios',
+                data: dataReverse.map(i => i.cantidad_pasos),
+                borderColor: '#2ecc71',
+                backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+/**
+ * Lógica de racha (Días seguidos con actividad)
+ */
+function calcularRacha(lista) {
+    let racha = 0;
+    for (const registro of lista) {
+        if (registro.cantidad_pasos > 0) racha++;
+        else break;
+    }
+    document.getElementById("racha-val").innerText = racha;
+}
+
+/**
+ * Manejo de eventos (Listeners)
+ */
+function setupEventListeners() {
+    // Filtro de fecha
+    document.getElementById("filtro").addEventListener("change", (e) => {
+        const busqueda = e.target.value;
+        const items = document.querySelectorAll(".item");
+        
+        items.forEach(item => {
+            const fechaItem = item.dataset.fecha;
+            item.style.display = (!busqueda || fechaItem.includes(busqueda)) ? "flex" : "none";
+        });
+    });
+
+    // Logout delegado al documento para mayor seguridad
+    document.addEventListener("click", (e) => {
+        if (e.target.closest("#logout-btn")) {
+            localStorage.removeItem(CONFIG.STORAGE_KEY);
+            window.location.replace("../auth/INDEX.HTML");
+        }
+    });
+}
+
+// Helper para formato de fecha si fuera necesario
+function formatearFecha(str) {
+    return str; // Aquí puedes añadir lógica de Moment o Intl.DateTimeFormat
+}
+    </script>
+</body>
+</html>

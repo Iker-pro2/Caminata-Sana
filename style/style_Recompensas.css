@@ -1,0 +1,190 @@
+:root {
+    --bg-dark: #095f3b;
+    --bg-card: #161b22;
+    --primary-green: #2ecc71;
+    --text-white: #f0f6fc;
+    --text-gray: #8b949e;
+    --border-card: #30363d;
+    --accent-green: #14df8a;
+}
+
+/* ================= BASE ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    line-height: 1.6;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ================= HEADER ================= */
+.main-header {
+    max-width: 1200px;
+    margin: 100px auto 20px; /* espacio por navbar externo */
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.header-title h1 {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.header-title p {
+    color: var(--text-gray);
+    margin-top: 5px;
+}
+
+/* ================= USER INFO ================= */
+.user-info {
+    background: var(--bg-card);
+    padding: 15px 25px;
+    border-radius: 15px;
+    border: 1px solid var(--border-card);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    text-align: right;
+}
+
+.username {
+    color: var(--primary-green);
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.saldo-label {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+}
+
+.saldo-puntos {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent-green);
+}
+
+/* ================= GRID ================= */
+.recompensas-grid {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+/* ================= TARJETAS ================= */
+.reward-card {
+    background: linear-gradient(145deg, #161b22, #1c222b);
+    border: 1px solid var(--border-card);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.reward-card.alcanzable {
+    border-left: 5px solid var(--primary-green);
+}
+
+.reward-card.bloqueada {
+    opacity: 0.6;
+    filter: grayscale(0.6);
+}
+
+.reward-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* ================= CONTENIDO ================= */
+.reward-header {
+    padding: 25px;
+}
+
+.reward-local {
+    font-size: 0.75rem;
+    color: var(--primary-green);
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.reward-titulo {
+    font-size: 1.4rem;
+    margin: 10px 0;
+}
+
+.reward-desc {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+/* ================= FOOTER ================= */
+.reward-footer {
+    padding: 20px 25px;
+    border-top: 2px dashed var(--border-card);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* COSTO */
+.costo-puntos {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-green);
+}
+
+/* BOTÓN */
+.btn-canjear {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+}
+
+.btn-canjear:hover:not(:disabled) {
+    transform: scale(1.07);
+    box-shadow: 0 10px 25px rgba(46, 204, 113, 0.5);
+}
+
+.btn-canjear:disabled {
+    background: #30363d;
+    color: #484f58;
+    cursor: not-allowed;
+}
+
+/* ================= LOADING ================= */
+.loading {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-gray);
+    grid-column: 1 / -1;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-info {
+        width: 100%;
+        text-align: left;
+    }
+}

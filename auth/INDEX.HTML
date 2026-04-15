@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caminata Sana - Iniciar Sesión</title>
+    <link rel="stylesheet" href="style.css"> 
+
+    <style>
+        /* Estilos específicos para el manejo de errores y estados */
+        .error-message {
+            display: none;
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #e74c3c;
+            font-size: 0.9rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        button:disabled {
+            filter: grayscale(1);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .extra-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+        
+        .extra-links a {
+            color: #7f8c8d;
+            text-decoration: none;
+        }
+
+        .extra-links a:hover {
+            color: #27ae60;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <img src="../img/logo.png" alt="Logo Caminata Sana" class="logo">
+            <h1>Caminata Sana</h1>
+            <p>Camina, acumula pasos y gana recompensas saludables.</p>
+        </div>
+
+        <div class="login-card">
+            <a href="../pagina web/Caminata Sana.html" class="btn-back">←</a>
+
+            <h2>Iniciar Sesión</h2>
+            <div id="response-message" class="error-message"></div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" id="correo" placeholder="ejemplo@correo.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" id="contrasena" placeholder="********" required>
+                </div>
+
+                <button type="submit" id="btnIngresar">Ingresar</button>
+
+                <div class="extra-links">
+                    <a href="Contrasena_olvidada.html">¿Olvidaste tu contraseña?</a>
+                    <a href="Regristrate.html">Crear cuenta nueva</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+const API_URL = "https://mercilessly-micellar-annika.ngrok-free.dev";
+const STORAGE_KEY = "usuarioCaminataSana";
+
+const loginForm = document.getElementById("loginForm");
+const responseMessage = document.getElementById("response-message");
+const btnIngresar = document.getElementById("btnIngresar");
+const correoInput = document.getElementById("correo");
+const passInput = document.getElementById("contrasena");
+
+/* ================= VALIDACIÓN EMAIL ================= */
+function validarEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/* ================= MENSAJES ================= */
+function mostrarError(msg) {
+    responseMessage.textContent = msg;
+    responseMessage.style.display = "block";
+}
+
+function limpiarError() {
+    responseMessage.textContent = "";
+    responseMessage.style.display = "none";
+}
+
+/* ================= SESIÓN ACTIVA ================= */
+function verificarSesion() {
+    try {
+        const token = localStorage.getItem("token");
+        const usuario = localStorage.getItem(STORAGE_KEY);
+
+        if (!token || !usuario) return;
+
+        const user = JSON.parse(usuario);
+
+        window.location.href = user.rol_id === 1
+            ? "../CONTENIDO/admin/dashboard.html"
+            : "../CONTENIDO/index.html";
+
+    } catch (e) {
+        localStorage.clear();
+    }
+}
+verificarSesion();
+
+/* ================= LOGIN ================= */
+loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    limpiarError();
+
+    const correo = correoInput.value.trim().toLowerCase();
+    const contrasena = passInput.value.trim();
+
+    /* VALIDACIONES FRONT */
+    if (!correo || !contrasena) {
+        mostrarError("Completa todos los campos");
+        return;
+    }
+
+    if (!validarEmail(correo)) {
+        mostrarError("Correo inválido (ejemplo: usuario@gmail.com)");
+        return;
+    }
+
+    /* UI LOADING */
+    btnIngresar.disabled = true;
+    btnIngresar.textContent = "Verificando...";
+
+    try {
+        const response = await fetch(`${API_URL}/api/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true"
+            },
+            body: JSON.stringify({ correo, contrasena })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Error al iniciar sesión");
+        }
+
+        /* GUARDAR SESIÓN */
+        localStorage.setItem("token", data.token);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data.usuario));
+
+        /* REDIRECCIÓN */
+        window.location.href = data.usuario.rol_id === 1
+            ? "../CONTENIDO/admin/dashboard.html"
+            : "../CONTENIDO/index.html";
+
+    } catch (error) {
+        mostrarError(error.message);
+    } finally {
+        btnIngresar.disabled = false;
+        btnIngresar.textContent = "Ingresar";
+    }
+});
+</script>
+</body>
+</html>

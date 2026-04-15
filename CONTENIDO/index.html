@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Caminata Sana - Dashboard</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <link rel="apple-touch-icon" href="../img/logo.png">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+
+<script>
+    // 🔐 Protección de sesión inmediata
+    if (!localStorage.getItem('usuarioCaminataSana')) {
+        window.location.replace('../auth/INDEX.HTML');
+    }
+</script>
+
+<script src="navbar.js"></script>
+<link rel="stylesheet" href="../style/navbar.css">
+
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 id="welcome-message">¡Bienvenido!</h1>
+        <div class="geo-status-container">
+            <span id="geo-status-dot" class="status-dot offline"></span>
+            <span id="geo-text">Buscando GPS...</span>
+        </div>
+        <div id="map"></div>
+    </div>
+</section>
+
+<main class="container">
+    <div class="locales-grid">
+        <div class="local-card">
+            <div class="icon-box bg-gold">
+                <i class="fas fa-walking"></i>
+            </div>
+            <h3 id="contador-pasos">0</h3>
+            <p>Pasos en esta sesión</p>
+        </div>
+
+        <div class="local-card">
+            <div class="icon-box bg-green">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 id="status-label">Inactivo</h3>
+            <p>Estado actual</p>
+        </div>
+    </div>
+
+    <section id="info-puntos" style="text-align: center; margin-top: 20px;">
+        <div class="local-card" style="max-width: 300px; margin: 0 auto;">
+            <p>Saldo Total Acumulado</p>
+            <h2 id="saldo-display" style="color: #4CAF50;">Cargando...</h2>
+        </div>
+    </section>
+</main>
+
+<footer>
+    &copy; 2026 Caminata Sana &bull; Tu salud es el mejor premio
+</footer>
+
+<script>
+// 1. Configuración de URLs
+const API_URL = "https://mercilessly-micellar-annika.ngrok-free.dev";
+const STORAGE_KEY = "usuarioCaminataSana"; // 🔑 Llave unificada
+
+const token = localStorage.getItem("token");
+let usuario = null;
+
+// 🔐 VALIDAR SESIÓN
+try {
+    // Intentamos leer con la llave correcta
+    const usuarioRaw = localStorage.getItem(STORAGE_KEY);
+    usuario = JSON.parse(usuarioRaw);
+
+    if (!token || !usuario) throw new Error("No hay sesión");
+
+    // Mostrar mensaje de bienvenida
+    const welcomeMsg = document.getElementById('welcome-message');
+    if (welcomeMsg) welcomeMsg.innerText = `¡Hola, ${usuario.nombre}! 👋`;
+
+} catch (e) {
+    console.error("Fallo en validación de sesión:", e);
+    localStorage.clear();
+    window.location.href = "../auth/INDEX.HTML";
+}
+
+/**
+ * 💰 SALDO SEGURO
+ */
+async function cargarSaldoActualizado() {
+    if (!usuario || !usuario.id) return;
+
+    try {
+        // Corregido: Tu servidor espera /api/usuario/saldo/:id
+        const res = await fetch(`${API_URL}/api/usuario/saldo/${usuario.id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
+
+        if (res.status === 401 || res.status === 403) {
+            throw new Error("Sesión expirada");
+        }
+
+        const data = await res.json();
+
+        const display = document.getElementById('saldo-display');
+        if (display) {
+            // Ajustado a los nombres de columna que devuelve tu servidor
+            display.innerText = (data.saldo_actual_pasos || 0).toLocaleString() + " pasos";
+        }
+
+    } catch (e) { 
+        console.error("Error al cargar saldo:", e);
+
+        if (e.message.includes("Sesión")) {
+            localStorage.clear();
+            window.location.href = "../auth/INDEX.HTML";
+        }
+
+        const display = document.getElementById('saldo-display');
+        if (display) display.innerText = "Error";
+    }
+}
+
+// Carga inicial y repetición
+cargarSaldoActualizado();
+setInterval(cargarSaldoActualizado, 45000);
+
+/**
+ * 🚪 LOGOUT
+ */
+window.addEventListener('DOMContentLoaded', () => {
+    // Reducimos el timeout o lo quitamos si el botón ya existe en el HTML
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.onclick = (e) => {
+            e.preventDefault();
+            if(confirm("¿Cerrar sesión?")) {
+                localStorage.clear();
+                window.location.replace('../auth/INDEX.HTML');
+            }
+        };
+    }
+});
+</script>
+
+</body>
+</html>

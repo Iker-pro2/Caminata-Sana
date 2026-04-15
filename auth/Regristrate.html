@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style_registrate.css"> 
+    
+    <title>Caminata Sana - Registro</title>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <img src="../img/logo.png" alt="Logo Caminata Sana" class="logo">
+            <h1>Caminata Sana</h1>
+            <p>Camina, acumula pasos y gana recompensas saludables.</p>
+        </div>
+
+        <div class="registro-card">
+            <a href="../pagina web/Caminata Sana.html" class="btn-back" title="Volver a la página principal">←</a>
+
+            <h2>¡Empieza a caminar!</h2>
+            <p>Crea tu cuenta y mejora tu salud paso a paso.</p>
+
+            <div id="response-container" class="response-message" aria-live="polite"></div>
+
+            <form id="registroForm">
+                <div class="input-group">
+                    <label for="nombre_completo">Nombre Completo</label>
+                    <input type="text" id="nombre_completo" name="nombre_completo" placeholder="Ej. Juan Pérez" required minlength="3">
+                </div>
+                
+                <div class="input-group">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.com" required>
+                </div>
+
+                <div class="input-group password-wrapper">
+                    <label for="password">Contraseña segura</label>
+                    <input type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    <button type="button" id="togglePassword" class="toggle-btn" aria-label="Mostrar u ocultar contraseña">👁️</button>
+                </div>
+
+                <button type="submit" id="btnRegistrarse">Unirse ahora</button>
+            </form>
+
+            <p class="footer-link">¿Ya eres caminante? <a href="index.html">Inicia sesión</a></p>
+        </div>
+    </div>  
+
+    <script>
+const API_URL = "https://mercilessly-micellar-annika.ngrok-free.dev";
+
+const registroForm = document.getElementById('registroForm');
+const btnRegistrarse = document.getElementById('btnRegistrarse');
+const responseContainer = document.getElementById('response-container');
+
+const nombreInput = document.getElementById('nombre_completo');
+const correoInput = document.getElementById('correo');
+const passwordInput = document.getElementById('password');
+
+/* ================= VALIDACIONES ================= */
+function validarEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validarNombre(nombre) {
+    return /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,}$/.test(nombre);
+}
+
+/* ================= UI ================= */
+function mostrarMensaje(msg, tipo = "error") {
+    responseContainer.textContent = msg;
+    responseContainer.style.display = "block";
+    responseContainer.className = `response-message ${tipo}`;
+}
+
+function limpiarMensaje() {
+    responseContainer.textContent = "";
+    responseContainer.style.display = "none";
+}
+
+/* ================= TOGGLE PASSWORD ================= */
+document.querySelector('#togglePassword').addEventListener('click', () => {
+    const type = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = type;
+    document.querySelector('#togglePassword').textContent = type === 'password' ? '👁️' : '🙈';
+});
+
+/* ================= SUBMIT ================= */
+registroForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    limpiarMensaje();
+
+    const nombreCompleto = nombreInput.value.trim();
+    const correo = correoInput.value.trim().toLowerCase();
+    const contrasena = passwordInput.value.trim();
+
+    /* VALIDACIONES FRONT */
+    if (!nombreCompleto || !correo || !contrasena) {
+        mostrarMensaje("Completa todos los campos", "error");
+        return;
+    }
+
+    if (!validarNombre(nombreCompleto)) {
+        mostrarMensaje("Nombre inválido (solo letras y mínimo 3 caracteres)", "error");
+        return;
+    }
+
+    if (!validarEmail(correo)) {
+        mostrarMensaje("Correo inválido (ejemplo: usuario@gmail.com)", "error");
+        return;
+    }
+
+    if (contrasena.length < 6) {
+        mostrarMensaje("La contraseña debe tener mínimo 6 caracteres", "error");
+        return;
+    }
+
+    /* SPLIT NOMBRE */
+    const partes = nombreCompleto.split(' ');
+    const nombre = partes[0];
+    const apellido = partes.slice(1).join(' ') || '';
+
+    /* UI LOADING */
+    btnRegistrarse.disabled = true;
+    btnRegistrarse.textContent = "Registrando...";
+
+    try {
+        const response = await fetch(`${API_URL}/api/registrar`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                nombre,
+                apellido,
+                correo,
+                contrasena
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "No se pudo crear la cuenta");
+        }
+
+        mostrarMensaje("Cuenta creada correctamente. Redirigiendo...", "success");
+
+        registroForm.reset();
+
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 1800);
+
+    } catch (error) {
+        mostrarMensaje(error.message, "error");
+    } finally {
+        btnRegistrarse.disabled = false;
+        btnRegistrarse.textContent = "Unirse ahora";
+    }
+});
+</script>
+</body>
+</html>

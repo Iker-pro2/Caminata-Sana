@@ -1,0 +1,24 @@
+{
+  "short_name": "CaminataSana",
+  "name": "Caminata Sana",
+  "icons": [
+    {
+      "src": "../img/logo.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "../img/logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "./",
+  "theme_color": "#4CAF50",
+  "description": "App de pasos y recompensas locales en García y Santa Catarina."
+}
