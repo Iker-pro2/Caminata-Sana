@@ -28,15 +28,14 @@ app.use(cors({
 
 // 2. Lectura de JSON
 app.use(express.json());
-
-// 3. Servir archivos estáticos (Imágenes, CSS, JS)
-// Esto permite que el navegador acceda a las carpetas dentro de CONTENEDOR
-app.use(express.static(path.join(__dirname, '../CONTENEDOR')));
+// 3. Servir archivos estáticos (Imágenes, CSS, JS) desde CONTENEDOR
+// Eliminamos el '../' porque la carpeta está en la misma raíz que server.js
+app.use(express.static(path.join(__dirname, 'CONTENEDOR')));
 
 // 4. Ruta raíz para cargar tu aplicación
-// Esto resuelve el error "Cannot GET /" enviando tu archivo index.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../CONTENEDOR', 'pagina web', 'index.html'));
+    // Ajustamos la ruta para que coincida exactamente con tu carpeta 'pagina web'
+    res.sendFile(path.join(__dirname, 'CONTENEDOR', 'pagina web', 'index.html'));
 });
 
 // ==============================
