@@ -35,7 +35,7 @@ app.use(express.static(path.join(__dirname, 'CONTENEDOR')));
 // 4. Ruta raíz para cargar tu aplicación
 app.get('/', (req, res) => {
     // Ajustamos la ruta para que coincida exactamente con tu carpeta 'pagina web'
-    res.sendFile(path.join(__dirname, 'CONTENEDOR', 'pagina web', 'index.html'));
+    res.sendFile(path.join(__dirname, 'CONTENEDOR', 'pagina web', 'INDEX.HTML'));
 });
 
 // ==============================
