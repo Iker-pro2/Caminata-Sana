@@ -36,7 +36,7 @@ app.use(express.static(path.join(__dirname, '..', 'CONTENEDOR')));
 // 2. Para el archivo INDEX.HTML
 app.get('/', (req, res) => {
     // Asegúrate de que los nombres coincidan exactamente con tu carpeta (Minúsculas/Mayúsculas)
-    res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'pagina web', 'INDEX.HTML'));
+    res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'auth', 'INDEX.HTML'));
 });
 
 // ==============================
