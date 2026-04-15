@@ -602,7 +602,9 @@ app.patch('/api/usuarios/update-correo', async (req, res) => {
 /* ============================================================================== 
 INICIO DEL SERVIDOR
 ============================================================================== */
-app.listen(PORT, () => {
-    // CORRECCIÓN: Comillas y formato en el console.log
-    console.log(`🔥 Servidor Caminata Sana corriendo en: http://localhost:${PORT}`);
+// SOLUCIÓN: Definir la variable usando la que te da Render o 10000 por defecto
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
