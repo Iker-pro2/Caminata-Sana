@@ -18,25 +18,24 @@ const app = express();
 // MIDDLEWARES Y RUTAS ESTÁTICAS
 // ==============================
 
-// 1. Configuración de CORS (Permite que el frontend hable con el backend)
+// 1. Configuración de CORS
 app.use(cors({
-    origin: '*', // Permite peticiones de cualquier origen para evitar el bloqueo de CORS
+    origin: '*', 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// 2. Lectura de JSON
 app.use(express.json());
 
-// 3. Servir carpetas estáticas (CSS, Imágenes, JS)
-// Usamos '..' porque el servidor está en /back y las carpetas están afuera
-app.use('/CONTENIDO', express.static(path.join(__dirname, '..', 'CONTENIDO')));
-app.use('/img', express.static(path.join(__dirname, '..', 'img')));
+// 2. Servir carpetas estáticas (Corregido según tu estructura)
+// Como CONTENIDO e img están dentro de CONTENEDOR, la ruta es:
+app.use('/CONTENIDO', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'CONTENIDO')));
+app.use('/img', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'img')));
 app.use('/CONTENEDOR', express.static(path.join(__dirname, '..', 'CONTENEDOR')));
 
-// 4. Ruta principal (Sirve el Login al entrar a la URL)
+// 3. Ruta principal para el Login
 app.get('/', (req, res) => {
-    // Asegúrate de que el nombre coincida: inicio_Sesion.HTML
+    // Apunta directamente a la ubicación física del archivo
     res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'auth', 'inicio_Sesion.HTML'));
 });
 // ==============================
