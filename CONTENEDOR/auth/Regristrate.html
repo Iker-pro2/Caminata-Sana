@@ -47,7 +47,7 @@
         </div>
     </div>  
 
-    <script>
+<script>
 const API_URL = "https://caminata-sana.onrender.com";
 
 const registroForm = document.getElementById('registroForm');
@@ -116,10 +116,12 @@ registroForm.addEventListener('submit', async (e) => {
         return;
     }
 
-    /* SPLIT NOMBRE */
+    /* SPLIT NOMBRE: Evita el error "Field 'apellido' doesn't have a default value"
+       Si el usuario solo pone un nombre, asignamos un punto "." al apellido para que la DB no lo rechace.
+    */
     const partes = nombreCompleto.split(' ');
     const nombre = partes[0];
-    const apellido = partes.slice(1).join(' ') || '';
+    const apellido = partes.slice(1).join(' ') || '.'; // Si no hay apellido, enviamos un punto
 
     /* UI LOADING */
     btnRegistrarse.disabled = true;
@@ -132,10 +134,10 @@ registroForm.addEventListener('submit', async (e) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                nombre,
-                apellido,
-                correo,
-                contrasena
+                nombre: nombre,
+                apellido: apellido,
+                correo: correo,
+                contrasena: contrasena
             })
         });
 
@@ -145,15 +147,17 @@ registroForm.addEventListener('submit', async (e) => {
             throw new Error(data.error || "No se pudo crear la cuenta");
         }
 
-        mostrarMensaje("Cuenta creada correctamente. Redirigiendo...", "success");
+        mostrarMensaje("¡Cuenta creada! Redirigiendo...", "success");
 
         registroForm.reset();
 
+        // Redirección exitosa
         setTimeout(() => {
-            window.location.href = "index.html";
-        }, 1800);
+            window.location.href = "inicio_Sesion.HTML"; 
+        }, 1500);
 
     } catch (error) {
+        console.error("Error capturado:", error);
         mostrarMensaje(error.message, "error");
     } finally {
         btnRegistrarse.disabled = false;
