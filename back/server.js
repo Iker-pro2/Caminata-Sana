@@ -18,27 +18,20 @@ const app = express();
 // MIDDLEWARES Y RUTAS ESTÁTICAS
 // ==============================
 
-// 1. Habilitar CORS
-app.use(cors({
-    origin: '*', // Permite pruebas más fáciles, luego puedes cerrarlo a tu URL
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-app.use(express.json());
-
-// 2. SERVIR CARPETAS ESPECÍFICAS (La clave del éxito)
-// Esto mapea la carpeta física a una ruta de URL
+// 1. Servir la carpeta CONTENIDO (Donde está tu CSS)
+// Usamos '..' para salir de la carpeta 'back' y entrar a 'CONTENIDO'
 app.use('/CONTENIDO', express.static(path.join(__dirname, '..', 'CONTENIDO')));
-app.use('/CONTENEDOR', express.static(path.join(__dirname, '..', 'CONTENEDOR')));
-app.use('/imagen', express.static(path.join(__dirname, '..', 'imagen')));
 
-// 3. RUTA PARA EL LOGIN (INDEX.HTML)
+// 2. Servir la carpeta img (Para que cargue el logo)
+app.use('/img', express.static(path.join(__dirname, '..', 'img')));
+
+// 3. Servir la carpeta CONTENEDOR (Donde están tus HTML)
+app.use('/CONTENEDOR', express.static(path.join(__dirname, '..', 'CONTENEDOR')));
+
+// Ruta principal
 app.get('/', (req, res) => {
-    // Verifica si tu archivo se llama INDEX.HTML o inicio_Sesion.HTML en el servidor
     res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'auth', 'inicio_Sesion.HTML'));
 });
-
 // ==============================
 // TOKENS DE RECUPERACIÓN
 // ==============================
