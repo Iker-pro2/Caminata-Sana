@@ -104,37 +104,54 @@ function verificarToken(req, res, next) {
 }
 
 /* ==============================================================================
-📝 REGISTRO (Corregido para evitar Error 500)
+📝 REGISTRO (Sincronizado con la base de datos CaminataSana)
 ============================================================================== */
 app.post('/api/registrar', async (req, res) => {
+    // 1. Desestructuración de datos desde el cuerpo de la petición
     let { nombre, apellido, correo, contrasena } = req.body;
 
-    // Se agrega 'apellido' a la validación para que la DB no lo rechace
+    // 2. Validación de campos obligatorios
+    // Esto previene que la DB lance el error "Field 'apellido' doesn't have a default value"
     if (!nombre || !apellido || !correo || !contrasena) {
-        return res.status(400).json({ error: "Todos los campos (incluyendo apellido) son obligatorios" });
+        return res.status(400).json({ 
+            error: "Todos los campos (nombre, apellido, correo y contraseña) son obligatorios" 
+        });
     }
 
+    // 3. Limpieza y validación de formato
     correo = correo.trim().toLowerCase();
     if (contrasena.length < 6) {
         return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
     }
 
     try {
+        // 4. Encriptación de la contraseña con Bcrypt
         const hash = await bcrypt.hash(contrasena, 10);
-        // Se asegura el registro con rol_id 2 (Usuario) por defecto
+
+        // 5. Inserción en la base de datos
+        // Se define rol_id 2 (Usuario) y activo TRUE por defecto
         const [result] = await pool.execute(
             `INSERT INTO usuarios (rol_id, nombre, apellido, correo, contrasena_hash, activo) 
              VALUES (2, ?, ?, ?, ?, TRUE)`,
             [nombre.trim(), apellido.trim(), correo, hash]
         );
 
-        res.json({ mensaje: "Usuario registrado con éxito", id: result.insertId });
+        // 6. Respuesta exitosa
+        res.json({ 
+            mensaje: "¡Usuario registrado con éxito!", 
+            id: result.insertId 
+        });
+
     } catch (error) {
+        // Manejo de errores específicos (como correos duplicados)
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(400).json({ error: "Este correo electrónico ya está registrado" });
         }
-        console.error("Error en registro:", error);
-        res.status(500).json({ error: "Error interno en el servidor al registrar" });
+        
+        console.error("❌ Error en registro:", error);
+        res.status(500).json({ 
+            error: "Error interno en el servidor al procesar el registro" 
+        });
     }
 });
 
