@@ -42,20 +42,20 @@ app.get('/', (req, res) => {
 // ==============================
 //base de datos
 
-const tokensRecuperacion = {};
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+    port: process.env.DB_PORT || 47027, // Forzamos el puerto de Railway
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    // ESTO ES LO QUE DETIENE EL "CONNECTION LOST"
+    // ⬇️ ESTO ES LO QUE ESTÁ FALTANDO ⬇️
     ssl: {
         rejectUnauthorized: false
     },
-    connectTimeout: 20000,
-    enableKeepAlive: true,
-    keepAliveInitialDelay: 10000
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    connectTimeout: 20000
 });
 //========================
 // TEST DE CONEXIÓN
