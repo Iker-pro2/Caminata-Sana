@@ -27,19 +27,15 @@ app.use(cors({
 
 app.use(express.json());
 
-// 2. Servir carpetas estáticas (Corregido según tu estructura real)
-// __dirname suele apuntar a la carpeta 'back', por eso usamos '..' para subir un nivel
-app.use(express.static(path.join(__dirname, '..', 'CONTENEDOR')));
-
-// Rutas específicas para asegurar que el navegador encuentre todo
-app.use('/img', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'img')));
-app.use('/paginaWeb', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'paginaWeb')));
-app.use('/auth', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'auth')));
+// 2. Servir carpetas estáticas
+// Esto permite que el navegador encuentre /img, /paginaWeb, etc.
+const contenedorPath = path.join(__dirname, '..', 'CONTENEDOR');
+app.use(express.static(contenedorPath));
 
 // 3. Ruta principal para el Login
 app.get('/', (req, res) => {
-    // Esto cargará el login apenas abras la URL de Render
-    res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'auth', 'inicio_Sesion.HTML'));
+    // Esto resuelve el error "Cannot GET /" enviando el archivo de login al inicio
+    res.sendFile(path.join(contenedorPath, 'auth', 'inicio_Sesion.HTML'));
 });
 // ==============================
 // TOKENS DE RECUPERACIÓN
