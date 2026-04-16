@@ -19,6 +19,7 @@ const app = express();
 // ==============================
 
 // 1. Configuración de CORS
+// Permite que tu frontend en Render se comunique con el backend sin bloqueos
 app.use(cors({
     origin: '*', 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -27,19 +28,23 @@ app.use(cors({
 
 app.use(express.json());
 
-// 2. Servir carpetas estáticas (Corregido según tu estructura real)
-// __dirname suele apuntar a la carpeta 'back', por eso usamos '..' para subir un nivel
-app.use(express.static(path.join(__dirname, '..', 'CONTENEDOR')));
+// 2. Servir carpetas estáticas (Corregido para tu estructura)
+// Suponiendo que este archivo está en la carpeta 'back', subimos un nivel para entrar a 'CONTENEDOR'
+const pathContenedor = path.join(__dirname, '..', 'CONTENEDOR');
 
-// Rutas específicas para asegurar que el navegador encuentre todo
-app.use('/img', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'img')));
-app.use('/paginaWeb', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'paginaWeb')));
-app.use('/auth', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'auth')));
+// Servimos la raíz de CONTENEDOR para que detecte todos los archivos internos
+app.use(express.static(pathContenedor));
+
+// Definimos rutas específicas para asegurar que las imágenes y páginas carguen bien
+app.use('/img', express.static(path.join(pathContenedor, 'img')));
+app.use('/paginaWeb', express.static(path.join(pathContenedor, 'paginaWeb')));
+app.use('/auth', express.static(path.join(pathContenedor, 'auth')));
+app.use('/CONTENIDO', express.static(path.join(pathContenedor, 'CONTENIDO')));
 
 // 3. Ruta principal para el Login
+// Esto hace que al entrar a https://caminata-sana.onrender.com/ cargue automáticamente el Login
 app.get('/', (req, res) => {
-    // Esto cargará el login apenas abras la URL de Render
-    res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'auth', 'inicio_Sesion.HTML'));
+    res.sendFile(path.join(pathContenedor, 'auth', 'inicio_Sesion.HTML'));
 });
 // ==============================
 // TOKENS DE RECUPERACIÓN
