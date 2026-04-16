@@ -41,6 +41,8 @@ app.get('/', (req, res) => {
 // TOKENS DE RECUPERACIÓN
 // ==============================
 
+
+const tokensRecuperacion = {};
 // BASE DE DATOS
 
 const pool = mysql.createPool({
