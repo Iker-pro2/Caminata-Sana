@@ -14,29 +14,29 @@ dotenv.config();
 
 const app = express();
 
-
 // ==============================
 // MIDDLEWARES Y RUTAS ESTÁTICAS
 // ==============================
 
-// 1. Habilitar CORS (Configuración corregida para Render)
+// 1. Habilitar CORS
 app.use(cors({
-    origin: 'https://caminata-sana-1.onrender.com', // Sin la barra "/" al final
+    origin: '*', // Permite pruebas más fáciles, luego puedes cerrarlo a tu URL
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// 2. Lectura de JSON
 app.use(express.json());
-// 3. Servir archivos estáticos (Imágenes, CSS, JS) desde CONTENEDOR
-// Eliminamos el '../' porque la carpeta está en la misma raíz que server.js
-// 1. Para los archivos estáticos (subir un nivel con '..')
-app.use(express.static(path.join(__dirname, '..', 'CONTENEDOR')));
 
-// 2. Para el archivo INDEX.HTML
+// 2. SERVIR CARPETAS ESPECÍFICAS (La clave del éxito)
+// Esto mapea la carpeta física a una ruta de URL
+app.use('/CONTENIDO', express.static(path.join(__dirname, '..', 'CONTENIDO')));
+app.use('/CONTENEDOR', express.static(path.join(__dirname, '..', 'CONTENEDOR')));
+app.use('/imagen', express.static(path.join(__dirname, '..', 'imagen')));
+
+// 3. RUTA PARA EL LOGIN (INDEX.HTML)
 app.get('/', (req, res) => {
-    // Asegúrate de que los nombres coincidan exactamente con tu carpeta (Minúsculas/Mayúsculas)
-    res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'auth', 'INDEX.HTML'));
+    // Verifica si tu archivo se llama INDEX.HTML o inicio_Sesion.HTML en el servidor
+    res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'auth', 'inicio_Sesion.HTML'));
 });
 
 // ==============================
