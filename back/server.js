@@ -46,11 +46,15 @@ const tokensRecuperacion = {};
 // CONEXIÓN A BASE DE DATOS
 // ==============================
 const pool = mysql.createPool({
-    host: process.env.MYSQLHOST,
-    user: process.env.MYSQLUSER,
-    password: process.env.MYSQLPASSWORD,
-    database: process.env.MYSQLDATABASE,
-    port: process.env.MYSQLPORT || 3000,
+    // Usamos los nombres que tienes en tus capturas de pantalla
+    host: process.env.DB_HOST, 
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS, // En tu captura de Railway dice DB_PASS
+    database: process.env.DB_NAME,
+    
+    // IMPORTANTE: El puerto de MySQL en Railway siempre es 3306.
+    // No uses el puerto 3000 aquí, el 3000 es para tu servidor web.
+    port: 3306, 
 
     waitForConnections: true,
     connectionLimit: 10,
