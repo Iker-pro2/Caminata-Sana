@@ -156,14 +156,14 @@ loginForm.addEventListener("submit", async (e) => {
     btnIngresar.textContent = "Verificando...";
 
     try {
-        const response = await fetch(`${API_URL}/api/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "true"
-            },
-            body: JSON.stringify({ correo, contrasena })
-        });
+    const response = await fetch(`${API_URL}/api/login`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+        // Eliminamos la línea de ngrok para evitar el bloqueo de CORS
+    },
+    body: JSON.stringify({ correo, contrasena })
+});
 
         const data = await response.json();
 
