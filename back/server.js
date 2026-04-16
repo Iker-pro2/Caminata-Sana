@@ -22,20 +22,23 @@ const app = express();
 app.use(cors({
     origin: '*', 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'] // <-- Agrega esto
+    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
 }));
 
 app.use(express.json());
 
-// 2. Servir carpetas estáticas (Corregido según tu estructura)
-// Como CONTENIDO e img están dentro de CONTENEDOR, la ruta es:
-app.use('/CONTENIDO', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'CONTENIDO')));
+// 2. Servir carpetas estáticas (Corregido según tu estructura real)
+// __dirname suele apuntar a la carpeta 'back', por eso usamos '..' para subir un nivel
+app.use(express.static(path.join(__dirname, '..', 'CONTENEDOR')));
+
+// Rutas específicas para asegurar que el navegador encuentre todo
 app.use('/img', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'img')));
-app.use('/CONTENEDOR', express.static(path.join(__dirname, '..', 'CONTENEDOR')));
+app.use('/paginaWeb', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'paginaWeb')));
+app.use('/auth', express.static(path.join(__dirname, '..', 'CONTENEDOR', 'auth')));
 
 // 3. Ruta principal para el Login
 app.get('/', (req, res) => {
-    // Apunta directamente a la ubicación física del archivo
+    // Esto cargará el login apenas abras la URL de Render
     res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'auth', 'inicio_Sesion.HTML'));
 });
 // ==============================
