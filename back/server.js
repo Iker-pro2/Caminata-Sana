@@ -40,25 +40,24 @@ app.get('/', (req, res) => {
 // ==============================
 // TOKENS DE RECUPERACIÓN
 // ==============================
-const tokensRecuperacion = {};
+//base de datos
 
-// ==============================
-// CONEXIÓN A BASE DE DATOS
-// ==============================
+const tokensRecuperacion = {};
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 47027, // Si la variable falla, usa el número directo
+    // ESTO ES LO QUE DETIENE EL "CONNECTION LOST"
     ssl: {
         rejectUnauthorized: false
     },
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+    connectTimeout: 20000,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000
 });
-// ==============================
+//========================
 // TEST DE CONEXIÓN
 // ==============================
 pool.getConnection()
