@@ -14,7 +14,7 @@ body {
     align-items: center;
     justify-content: flex-end; /* Empuja el contenido a la derecha */
     /* --- CAMBIO: Tu imagen de fondo --- */
-    background-image: url('/CONTENEDOR/img/inicioSesion.jpg'); 
+    background-image: url('/img/inicioSesion.jpg'); 
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
