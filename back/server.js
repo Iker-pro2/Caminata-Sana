@@ -93,10 +93,11 @@ function verificarToken(req, res, next) {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // Validamos que el payload contenga la información necesaria
+
         if (!decoded.id || !decoded.rol) {
             return res.status(403).json({ error: "Token con formato inválido" });
         }
+
         req.usuario = decoded;
         next();
     } catch (error) {
@@ -105,46 +106,43 @@ function verificarToken(req, res, next) {
 }
 
 /* ==============================================================================
-📝 REGISTRO (Sincronizado con la base de datos CaminataSana)
+📝 REGISTRO (CORREGIDO A TU BD)
 ============================================================================== */
 app.post('/api/registrar', async (req, res) => {
-    // 1. Desestructuración de datos desde el cuerpo de la petición
-    let { nombre, apellido, correo, contrasena } = req.body;
 
-    // 2. Validación de campos obligatorios
-    // Esto previene que la DB lance el error "Field 'apellido' doesn't have a default value"
-    if (!nombre || !apellido || !correo || !contrasena) {
+    // 🔴 QUITAMOS apellido
+    let { nombre, correo, contrasena } = req.body;
+
+    // 🔴 VALIDACIÓN SIN apellido
+    if (!nombre || !correo || !contrasena) {
         return res.status(400).json({ 
-            error: "Todos los campos (nombre, apellido, correo y contraseña) son obligatorios" 
+            error: "Todos los campos (nombre, correo y contraseña) son obligatorios" 
         });
     }
 
-    // 3. Limpieza y validación de formato
     correo = correo.trim().toLowerCase();
+
     if (contrasena.length < 6) {
         return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
     }
 
     try {
-        // 4. Encriptación de la contraseña con Bcrypt
         const hash = await bcrypt.hash(contrasena, 10);
 
-        // 5. Inserción en la base de datos
-        // Se define rol_id 2 (Usuario) y activo TRUE por defecto
+        // 🔴 INSERT CORREGIDO (SIN apellido)
         const [result] = await pool.execute(
-            `INSERT INTO usuarios (rol_id, nombre, apellido, correo, contrasena_hash, activo) 
-             VALUES (2, ?, ?, ?, ?, TRUE)`,
-            [nombre.trim(), apellido.trim(), correo, hash]
+            `INSERT INTO usuarios (rol_id, nombre, correo, contrasena_hash, activo) 
+             VALUES (2, ?, ?, ?, TRUE)`,
+            [nombre.trim(), correo, hash]
         );
 
-        // 6. Respuesta exitosa
         res.json({ 
             mensaje: "¡Usuario registrado con éxito!", 
             id: result.insertId 
         });
 
     } catch (error) {
-        // Manejo de errores específicos (como correos duplicados)
+
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(400).json({ error: "Este correo electrónico ya está registrado" });
         }
@@ -157,7 +155,7 @@ app.post('/api/registrar', async (req, res) => {
 });
 
 /* ==============================================================================
-🔑 LOGIN
+🔑 LOGIN (CORREGIDO)
 ============================================================================== */
 app.post('/api/login', async (req, res) => {
     let { correo, contrasena } = req.body;
@@ -169,14 +167,14 @@ app.post('/api/login', async (req, res) => {
     correo = correo.trim().toLowerCase();
 
     try {
+        // 🔴 QUITAMOS apellido del SELECT
         const [rows] = await pool.execute(
-            `SELECT usuario_id, nombre, apellido, rol_id, contrasena_hash 
+            `SELECT usuario_id, nombre, rol_id, contrasena_hash 
              FROM usuarios WHERE correo = ? AND activo = 1`,
             [correo]
         );
 
         if (rows.length === 0) {
-            // Protección contra ataques de tiempo
             await bcrypt.compare(contrasena, '$2a$10$invalidhashforsecurity'); 
             return res.status(401).json({ error: "Credenciales inválidas" });
         }
@@ -188,7 +186,6 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ error: "Credenciales inválidas" });
         }
 
-        // Generación del Token JWT
         const token = jwt.sign(
             { id: usuario.usuario_id, rol: usuario.rol_id },
             process.env.JWT_SECRET,
@@ -200,10 +197,10 @@ app.post('/api/login', async (req, res) => {
             usuario: {
                 id: usuario.usuario_id,
                 nombre: usuario.nombre,
-                apellido: usuario.apellido,
                 rol_id: usuario.rol_id
             }
         });
+
     } catch (error) {
         console.error("Error en login:", error);
         res.status(500).json({ error: "Error al intentar iniciar sesión" });
@@ -211,7 +208,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 /* ==============================================================================
-📧 OLVIDÉ PASSWORD
+📧 OLVIDÉ PASSWORD (SIN CAMBIOS)
 ============================================================================== */
 app.post('/api/olvide-password', async (req, res) => {
     let { correo } = req.body;
@@ -222,7 +219,6 @@ app.post('/api/olvide-password', async (req, res) => {
     try {
         const [users] = await pool.execute('SELECT nombre FROM usuarios WHERE correo = ?', [correo]);
         
-        // Por seguridad, siempre respondemos "ok" aunque el correo no exista
         if (users.length === 0) return res.json({ ok: true });
 
         const token = crypto.randomBytes(3).toString('hex').toUpperCase();
@@ -238,15 +234,16 @@ app.post('/api/olvide-password', async (req, res) => {
             to: correo,
             subject: 'Código de Recuperación - Caminata Sana',
             html: `
-                <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee;">
-                    <h2 style="color: #2d5a27;">Recuperación de Cuenta</h2>
-                    <p>Hola, usa el siguiente código para restablecer tu contraseña:</p>
-                    <h1 style="background: #f4f4f4; padding: 10px; text-align: center; letter-spacing: 5px;">${token}</h1>
-                    <p>Este código <strong>expira en 10 minutos</strong>.</p>
+                <div style="font-family: sans-serif; padding: 20px;">
+                    <h2>Recuperación de Cuenta</h2>
+                    <p>Tu código es:</p>
+                    <h1>${token}</h1>
+                    <p>Expira en 10 minutos</p>
                 </div>`
         });
 
         res.json({ ok: true });
+
     } catch (error) {
         console.error("Error enviando correo:", error);
         res.status(500).json({ error: "No se pudo enviar el correo de recuperación" });
