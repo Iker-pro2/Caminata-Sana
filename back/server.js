@@ -40,7 +40,8 @@ app.get('/', (req, res) => {
 // ==============================
 // TOKENS DE RECUPERACIÓN
 // ==============================
-//base de datos
+
+// BASE DE DATOS
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
@@ -48,15 +49,16 @@ const pool = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    // ⬇️ ESTO ES LO QUE ESTÁ FALTANDO ⬇️
     ssl: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false // <--- ESTA ES LA LLAVE QUE FALTA
     },
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    connectTimeout: 30000 
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000
 });
+
 //========================
 // TEST DE CONEXIÓN
 // ==============================
