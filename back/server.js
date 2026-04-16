@@ -18,18 +18,25 @@ const app = express();
 // MIDDLEWARES Y RUTAS ESTÁTICAS
 // ==============================
 
-// 1. Servir la carpeta CONTENIDO (Donde está tu CSS)
-// Usamos '..' para salir de la carpeta 'back' y entrar a 'CONTENIDO'
+// 1. Configuración de CORS (Permite que el frontend hable con el backend)
+app.use(cors({
+    origin: '*', // Permite peticiones de cualquier origen para evitar el bloqueo de CORS
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// 2. Lectura de JSON
+app.use(express.json());
+
+// 3. Servir carpetas estáticas (CSS, Imágenes, JS)
+// Usamos '..' porque el servidor está en /back y las carpetas están afuera
 app.use('/CONTENIDO', express.static(path.join(__dirname, '..', 'CONTENIDO')));
-
-// 2. Servir la carpeta img (Para que cargue el logo)
 app.use('/img', express.static(path.join(__dirname, '..', 'img')));
-
-// 3. Servir la carpeta CONTENEDOR (Donde están tus HTML)
 app.use('/CONTENEDOR', express.static(path.join(__dirname, '..', 'CONTENEDOR')));
 
-// Ruta principal
+// 4. Ruta principal (Sirve el Login al entrar a la URL)
 app.get('/', (req, res) => {
+    // Asegúrate de que el nombre coincida: inicio_Sesion.HTML
     res.sendFile(path.join(__dirname, '..', 'CONTENEDOR', 'auth', 'inicio_Sesion.HTML'));
 });
 // ==============================
