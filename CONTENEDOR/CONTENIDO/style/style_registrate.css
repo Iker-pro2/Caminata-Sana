@@ -13,7 +13,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-end; /* Formulario a la derecha */
-    background-image: url('/CONTENEDOR/img/p.png'); /* Asegúrate de que la ruta sea correcta */
+    background-image: url('/img/p.png'); /* Asegúrate de que la ruta sea correcta */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
