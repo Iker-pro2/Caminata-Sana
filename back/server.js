@@ -43,7 +43,8 @@ app.get('/', (req, res) => {
 
 
 const tokensRecuperacion = {};
-// BASE DE DATOS
+
+//BASE DE DATOS
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
@@ -51,14 +52,18 @@ const pool = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
+    // Configuración de SSL obligatoria para Railway externo
     ssl: {
-        rejectUnauthorized: false // <--- ESTA ES LA LLAVE QUE FALTA
+        rejectUnauthorized: false
     },
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
+    // Mantener la conexión viva
     enableKeepAlive: true,
-    keepAliveInitialDelay: 10000
+    keepAliveInitialDelay: 10000,
+    // Tiempo de espera para evitar que Railway cierre la conexión por inactividad
+    connectTimeout: 20000 
 });
 
 //========================
