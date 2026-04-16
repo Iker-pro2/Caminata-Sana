@@ -46,15 +46,17 @@ const tokensRecuperacion = {};
 // CONEXIÓN A BASE DE DATOS
 // ==============================
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,      // Aquí entrará nozomi.proxy.rlwy.net
-    port: process.env.DB_PORT,      // Aquí entrará 47027
-    user: process.env.DB_USER,      
-    password: process.env.DB_PASS,  
-    database: process.env.DB_NAME,  
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 47027, // Si la variable falla, usa el número directo
     ssl: {
-        rejectUnauthorized: false   // Mantenlo para que Railway no te cierre la conexión
+        rejectUnauthorized: false
     },
-    connectTimeout: 30000 
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 // ==============================
 // TEST DE CONEXIÓN
