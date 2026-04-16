@@ -50,12 +50,13 @@ const pool = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 3306,
+    port: process.env.DB_PORT,
+    // ESTO EVITA QUE RAILWAY CIERRE LA CONEXIÓN
     ssl: {
-        rejectUnauthorized: false // Esto permite la conexión segura externa
+        rejectUnauthorized: false
     },
-    waitForConnections: true,
-    connectionLimit: 10
+    keepAliveInitialDelay: 10000, // Mantiene la conexión "despierta"
+    enableKeepAlive: true
 });
 // ==============================
 // TEST DE CONEXIÓN
