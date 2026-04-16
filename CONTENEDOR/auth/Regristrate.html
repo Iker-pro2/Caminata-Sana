@@ -91,23 +91,23 @@ registroForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     limpiarMensaje();
 
-    const nombreCompleto = nombreInput.value.trim();
+    const nombre = nombreInput.value.trim(); // ✅ nombre completo
     const correo = correoInput.value.trim().toLowerCase();
     const contrasena = passwordInput.value.trim();
 
-    /* VALIDACIONES FRONT */
-    if (!nombreCompleto || !correo || !contrasena) {
+    /* VALIDACIONES */
+    if (!nombre || !correo || !contrasena) {
         mostrarMensaje("Completa todos los campos", "error");
         return;
     }
 
-    if (!validarNombre(nombreCompleto)) {
+    if (!validarNombre(nombre)) {
         mostrarMensaje("Nombre inválido (solo letras y mínimo 3 caracteres)", "error");
         return;
     }
 
     if (!validarEmail(correo)) {
-        mostrarMensaje("Correo inválido (ejemplo: usuario@gmail.com)", "error");
+        mostrarMensaje("Correo inválido", "error");
         return;
     }
 
@@ -115,13 +115,6 @@ registroForm.addEventListener('submit', async (e) => {
         mostrarMensaje("La contraseña debe tener mínimo 6 caracteres", "error");
         return;
     }
-
-    /* SPLIT NOMBRE: Evita el error "Field 'apellido' doesn't have a default value"
-       Si el usuario solo pone un nombre, asignamos un punto "." al apellido para que la DB no lo rechace.
-    */
-    const partes = nombreCompleto.split(' ');
-    const nombre = partes[0];
-    const apellido = partes.slice(1).join(' ') || '.'; // Si no hay apellido, enviamos un punto
 
     /* UI LOADING */
     btnRegistrarse.disabled = true;
@@ -134,8 +127,7 @@ registroForm.addEventListener('submit', async (e) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                nombre: nombre,
-                apellido: apellido,
+                nombre: nombre,        // ✅ ahora correcto
                 correo: correo,
                 contrasena: contrasena
             })
@@ -151,9 +143,8 @@ registroForm.addEventListener('submit', async (e) => {
 
         registroForm.reset();
 
-        // Redirección exitosa
         setTimeout(() => {
-            window.location.href = "inicio_Sesion.HTML"; 
+            window.location.href = "inicio_Sesion.HTML";
         }, 1500);
 
     } catch (error) {
