@@ -44,7 +44,7 @@ app.get('/', (req, res) => {
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 47027, // Forzamos el puerto de Railway
+    port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
@@ -55,7 +55,7 @@ const pool = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    connectTimeout: 20000
+    connectTimeout: 30000 
 });
 //========================
 // TEST DE CONEXIÓN
